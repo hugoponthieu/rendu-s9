@@ -11,9 +11,152 @@ Author Name
 
 === Presentation du sujet
 
+La mission etudiee dans ce rapport prend place dans un contexte ou la
+croissance d'un systeme numerique ne se mesure pas seulement a la richesse de
+ses fonctionnalites, mais aussi a la capacite de l'organisation a les faire
+evoluer sans degrader la qualite du service rendu. Chez LeHibou, cette
+question se pose avec une acuite particuliere, car la chaine de valeur repose
+sur un ensemble technique distribue qui articule un front public, un backoffice
+interne, un backend en microservices et une couche d'infrastructure permettant
+de deployer des environnements temporaires proches du reel. Dans un tel cadre,
+la fiabilite operationnelle ne constitue pas un sujet annexe reserve a la seule
+exploitation. Elle devient une condition de la fluidite de livraison, de la
+lisibilite des incidents et, plus largement, de la confiance que les equipes
+peuvent accorder a leurs propres outils.
+
+Le point d'entree concret de la mission se situe dans la stabilisation des
+tests end-to-end. Ce choix n'a rien d'anecdotique. Les validations E2E portent
+sur des parcours qui traversent plusieurs couches du systeme, depuis les
+interfaces jusqu'aux services metier et aux donnees necessaires a l'execution
+des scenarios. Lorsqu'elles sont robustes, elles peuvent jouer un role de filet
+de securite avant integration et de support a l'automatisation. Lorsqu'elles
+restent fragiles, elles produisent au contraire un signal ambivalent :
+elles ralentissent les merges, exigent des verifications manuelles
+complementaires et entretiennent une forme de doute sur la realite des
+regressions detectees. L'enjeu n'est donc pas seulement de "faire passer des
+tests", mais de rendre credible un dispositif de validation dans un systeme ou
+les dependances sont nombreuses.
+
+Les elements observes dans l'ecosysteme LeHibou confirment d'ailleurs que cette
+question depasse largement le seul perimetre d'un front-end. Le front public
+cumule des fonctions d'acquisition, de recherche, d'authentification et de
+parcours metier. Bubo joue un role central pour les operations internes, avec
+des flux lies aux leads, aux candidats, aux contrats ou encore au suivi de
+mission. En arriere-plan, le backend rassemble un ensemble etendu de services
+specialises, relies a plusieurs bases de donnees, a des mecanismes de
+messagerie et a un moteur de recherche. Cette profondeur fonctionnelle explique
+pourquoi la validation de bout en bout ne peut pas reposer durablement sur des
+preconditions implicites, des comptes partages ou des donnees de test maintenues
+de maniere artisanale.
+
+La mission s'inscrit ainsi dans une lecture intrapreneuriale de la fiabilite.
+Il ne s'agit pas seulement de corriger un irritant local, mais de transformer
+une difficulte recurrente en capacite collective. La mise en place progressive
+d'un seeding plus explicite, l'usage d'environnements Fabrica pour rapprocher
+la validation de conditions d'execution realistes, puis l'amelioration de la
+lisibilite des incidents a travers Sentry et CloudWatch relevent d'une meme
+logique. L'objectif est de mieux maitriser le risque sans multiplier a
+l'infini les controles humains, les coordinations ad hoc et les reprises
+manuelles. Autrement dit, la mission relie directement des choix techniques a
+des enjeux d'efficacite operationnelle, de qualite de service et de maitrise
+des couts.
+
 === Problematique
 
+Le coeur du probleme peut se formuler de la maniere suivante : comment
+fiabiliser un systeme plus riche, plus distribue et plus realiste sans
+augmenter de facon disproportionnee le cout de sa verification et de son
+diagnostic ? La question est structurante, car l'observation du depot montre
+que LeHibou ne repose ni sur une application monolithique simple a simuler, ni
+sur un environnement unique suffisant pour toutes les validations. Le backend
+orchestralise de nombreux services, les interfaces couvrent des publics et des
+usages differents, et Fabrica cherche precisement a reconstruire des
+environnements ephemeres complets avec des donnees proches de la production.
+Dans ce contexte, la fiabilite ne peut pas etre obtenue par une simple
+addition d'outils ; elle depend de la qualite des articulations entre tests,
+donnees, environnements et observabilite.
+
+Du cote des tests end-to-end, plusieurs limites apparaissent. D'abord, certains
+scenarios restent sensibles a la machine d'execution ou a l'etat prealable des
+donnees. Ensuite, une partie des parcours depend encore de comptes statiques,
+de setups implicites ou de chainages entre scenarios qui affaiblissent
+l'autonomie des suites. Enfin, la question des donnees ne se reduit pas a la
+creation initiale d'entites. Elle implique aussi la disponibilite de jeux de
+donnees coherents a travers plusieurs domaines metier, la capacite a nettoyer
+ce qui a ete cree pour eviter la pollution inter-tests, ainsi que la
+reindexation des moteurs de recherche apres seeding afin que les parcours
+bases sur la recherche produisent un resultat fiable. Ces difficultes montrent
+que la fragilite des E2E releve autant d'un probleme de modelisation du
+contexte d'execution que d'un probleme de script de test.
+
+La problematique ne s'arrete cependant pas a la prevention des regressions. Un
+systeme distribue conserve toujours une part d'incertitude, meme lorsqu'il est
+mieux teste. C'est pourquoi le second versant du sujet concerne la lisibilite
+des incidents. La presence de Sentry dans les applications et dans le backend,
+ainsi que les chantiers autour des logs CloudWatch, indiquent que les outils
+existent deja. Pourtant, leur simple presence ne garantit pas une observabilite
+operationnelle suffisante. Si l'information remontee ne permet pas d'identifier
+rapidement le service, l'endpoint, le contexte ou le parcours concerne, le
+temps d'investigation demeure eleve et la coordination entre acteurs reste
+couteuse. L'enjeu reel n'est donc pas de "rajouter du monitoring", mais de
+rendre les signaux effectivement exploitables.
+
+La problematique generale du rapport consiste des lors a articuler trois
+exigences. Il faut d'abord mieux prevenir les regressions par des validations
+plus reproductibles. Il faut ensuite mieux comprendre les incidents residuels
+par une observabilite plus lisible. Il faut enfin faire en sorte que ces deux
+progres demeurent soutenables, c'est-a-dire compatibles avec le realisme des
+environnements, le temps disponible des equipes et la maitrise des couts
+techniques et organisationnels. C'est dans cette tension entre prevention,
+diagnostic et economie de coordination que se situe la contribution etudiee.
+
 === Demarche retenue
+
+Pour traiter cette problematique, la demarche retenue suit une progression en
+deux temps. Le premier consiste a reprendre de facon critique l'existant de la
+chaine de validation end-to-end afin d'identifier les causes concretes
+d'instabilite, puis a construire un socle plus reproductible. Cette orientation
+se justifie par un principe simple : un dispositif de diagnostic, meme utile,
+ne compense pas durablement une prevention insuffisante. Tant que les tests
+restent trop dependants d'etats implicites ou de preconditions difficiles a
+reproduire, l'organisation continue de payer un cout eleve en verifications
+manuelles, en retests et en hesitations au moment de livrer. Le travail sur le
+seeding, la normalisation des acces et l'autonomie des scenarios constitue donc
+la premiere brique de la transformation.
+
+Ce premier temps n'est pas pense comme une abstraction methodologique, mais
+comme une evolution ancree dans les contraintes du systeme. La mise en place
+d'un service de seeding transverse, capable d'interagir avec plusieurs bases et
+de fournir des donnees de reference, des utilisateurs ou des etats metier plus
+coherents, repond directement aux limites observees dans les fixtures statiques.
+De meme, le recours progressif a Fabrica vise a rapprocher l'execution des
+tests de conditions plus realistes, avec des environnements complets et des
+donnees plus proches des usages effectifs. Cette trajectoire reste toutefois a
+presenter avec prudence : plusieurs sujets demeurent ouverts, notamment sur la
+qualite des jeux de donnees, la reindexation, la vitesse de deploiement ou la
+generalisation de l'automatisation apres merge sur `develop`.
+
+Le second temps prolonge logiquement le premier sans le dupliquer. Une fois
+posee la question de la prevention, il devient possible d'examiner celle du
+diagnostic. Le rapport etudie donc ensuite les chantiers lies a Sentry et a
+CloudWatch, non pour supposer une observabilite deja mature, mais pour evaluer
+ce qui doit encore etre clarifie afin de mieux localiser les incidents, de
+reduire le temps d'investigation et de limiter les coordinations inutiles entre
+equipes. Cette seconde partie n'est pas separee artificiellement de la
+premiere : elle en constitue le complement necessaire. Les tests reduisent la
+probabilite de certaines regressions ; l'observabilite ameliore la comprehension
+de celles qui subsistent.
+
+Le fil directeur de l'ensemble peut ainsi se resumer en trois verbes :
+fiabiliser, observer, arbitrer. Fiabiliser, pour produire un signal de
+validation plus credible avant livraison. Observer, pour rendre les incidents
+restants plus rapidement intelligibles. Arbitrer, enfin, parce que chaque
+amelioration doit etre appreciee au regard de son cout de mise en oeuvre, de
+sa diffusion possible a l'echelle de l'entreprise et de son impact sur
+l'efficacite collective. Le rapport n'analyse donc pas un dispositif deja
+entierement industrialise. Il etudie une trajectoire en cours, ses acquis, ses
+limites et la maniere dont une initiative technique ciblee peut devenir un
+levier intrapreneurial plus large.
 
 == Contexte de l'entreprise et opportunite intrapreneuriale
 
