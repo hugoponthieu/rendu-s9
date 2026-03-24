@@ -348,13 +348,202 @@ socle de fonctionnement plus scalable pour l'ensemble de l'entreprise.
 
 === Fragilité des validations end-to-end
 
+La fragilité actuelle des validations end-to-end tient d'abord au fait que ces
+tests portent sur des parcours réellement transverses dans un système dense,
+alors même que leurs préconditions ne sont pas encore suffisamment maîtrisées.
+Les chantiers ouverts autour des suites LeHibou et Bubo montrent que plusieurs
+scénarios demeurent sensibles à la machine d'exécution, à l'ordre de passage ou
+à l'état préalable du système. Cette situation affaiblit la fonction même du
+test E2E. Au lieu de produire un signal net sur la présence ou non d'une
+régression, il introduit une zone grise dans laquelle l'échec peut provenir du
+produit, du jeu de données, d'un scénario antérieur ou d'un défaut de
+préparation de l'environnement. Dans une chaîne de livraison active, une telle
+ambiguïté coûte plus cher qu'une absence partielle de couverture, car elle
+consomme du temps d'interprétation à chaque exécution douteuse.
+
+L'analyse des travaux prévus confirme que cette instabilité ne relève pas
+seulement de quelques cas isolés. Plusieurs suites doivent encore être
+reprises pour supprimer des scénarios de transition, des doubles logins, des
+préconditions implicites ou des enchaînements entre scénarios. Des parcours
+mission simples doivent être isolés d'autres scénarios dont ils dépendaient
+jusqu'ici ; des flux multi-acteurs doivent être redécoupés pour que chaque cas
+reste autonome ; des suites Bubo doivent être reconstruites autour de jeux de
+données déterministes. Autrement dit, le problème n'est pas limité à
+l'implémentation d'un test précis. Il touche à la manière dont le contexte de
+validation a été historiquement encapsulé dans les suites elles-mêmes, avec une
+part trop importante de savoir tacite.
+
+Cette fragilité a un effet immédiat sur la confiance organisationnelle. Quand
+une suite échoue sans que la cause soit immédiatement lisible, les équipes
+hésitent à traiter l'échec comme un signal produit et non comme un bruit
+technique. Le réflexe devient alors de relancer, de vérifier manuellement ou de
+mobiliser une personne connaissant les subtilités du scénario. Ce déplacement
+de la charge de preuve est défavorable au rythme de livraison. Il ralentit les
+merges, retarde certaines décisions de déploiement et maintient une dépendance
+forte à quelques profils capables de reconstruire mentalement l'état attendu du
+système. En ce sens, l'instabilité E2E ne constitue pas seulement une dette de
+test ; elle devient une dette de coordination.
+
 === Limites de l'automatisation actuelle
+
+Les limites de l'automatisation découlent logiquement de cette instabilité.
+L'objectif visé est clair : déclencher automatiquement les tests E2E après les
+merges sur `develop` afin de renforcer le flux de déploiement. Toutefois, les
+travaux encore ouverts montrent que cette automatisation ne peut pas être
+considérée comme un acquis. Elle suppose d'abord que le signal de validation
+soit suffisamment crédible pour être utilisé comme mécanisme d'arbitrage. Tant
+que des tests ne fonctionnent pas de manière homogène selon les contextes
+d'exécution, automatiser leur lancement à large échelle risquerait de
+transformer la CI en source de contestation permanente plutôt qu'en appui à la
+décision.
+
+Cette limite est importante, car une automatisation peu fiable ne réduit pas
+réellement le travail humain ; elle le déplace. Une suite déclenchée
+automatiquement mais fréquemment douteuse oblige ensuite à trier les faux
+positifs, à relancer des pipelines, à vérifier l'environnement visé et à
+réinterpréter les résultats. Le coût machine reste supportable, mais le coût
+collectif d'analyse augmente. L'enjeu n'est donc pas d'ajouter mécaniquement un
+déclenchement sur `develop`. Il est de faire en sorte qu'une exécution
+automatisée puisse être lue comme une information robuste, suffisamment stable
+pour conditionner un merge ou éclairer une décision de livraison.
+
+Il faut également noter que l'automatisation cible n'est pas pensée pour un
+environnement abstrait. Les tickets ouverts relient explicitement ce sujet à
+l'exécution sur Fabrica, c'est-à-dire sur des environnements temporaires plus
+proches du réel. Cette ambition est cohérente avec l'architecture observée,
+mais elle renforce les exigences préalables. Plus l'environnement est réaliste,
+plus les dépendances entre services, données et indexation deviennent visibles.
+Automatiser trop tôt reviendrait donc à industrialiser une instabilité encore
+mal contenue. Le frein actuel n'est pas un manque d'outillage de CI ; c'est
+l'absence, à ce stade, d'un socle de tests et de données assez robuste pour
+supporter une industrialisation sans générer davantage de bruit opérationnel.
 
 === Dépendance aux données et aux environnements
 
+La dépendance aux données apparaît comme l'une des causes les plus structurantes
+des fragilités constatées. Les différentes feuilles de route convergent sur un
+point : une part trop importante des suites repose encore sur des comptes
+statiques, des fixtures difficiles à maintenir, des inscriptions effectuées
+uniquement pour préparer un scénario ou des états métier supposés déjà présents
+dans le système. Dans un environnement distribué, cette approche atteint vite
+ses limites. Un parcours mission, un favori, une alerte, une candidature ou un
+lead gagné ne se résument pas à une seule ligne en base. Chaque cas d'usage
+mobilise plusieurs entités, plusieurs services et parfois plusieurs temporalités
+métier. Dès lors, une donnée de test approximative ou incomplète suffit à
+affaiblir tout le scénario.
+
+Les travaux engagés sur un service de seeding global montrent bien cette
+profondeur du problème. Le besoin n'est pas seulement de créer quelques
+utilisateurs à la volée, mais de disposer d'une API capable de produire des
+états métier configurables à travers plusieurs bases, pour le développement
+local, les validations E2E et les environnements Fabrica. Les modules prévus
+pour les utilisateurs, les missions, les favoris, les alertes ou encore les
+données de référence traduisent une exigence de normalisation plus large :
+sortir d'une logique où les suites embarquent leur propre bricolage de setup et
+revenir à un contrat commun de préparation des données. Le fait que les tests
+aient jusqu'ici recopié des entités du backend dans leur propre dépôt indique
+d'ailleurs que la séparation entre logique de test et logique de création des
+données n'était pas encore suffisamment stabilisée.
+
+À cette dépendance s'ajoute la question de l'indexation. Le backend comporte un
+service de recherche dédié, des commandes de réindexation multiples et des
+parcours métier qui dépendent directement de la trouvabilité des missions, des
+freelances ou des leads. Or les travaux prévus autour d'une API d'indexation
+montrent qu'après seeding, les index ne sont pas nécessairement à jour et que
+la réindexation demeure, pour certains cas, une opération manuelle exécutée à
+l'intérieur du conteneur de recherche. Cette contrainte casse l'automatisation
+et explique pourquoi un scénario apparemment correct peut néanmoins échouer ou
+retourner des résultats incohérents. Ce point est décisif : dans un système où
+la recherche fait partie du comportement métier observable, la donnée seedée ne
+vaut réellement comme précondition que si son exposition via l'index est, elle
+aussi, intégrée au contrat d'exécution.
+
+Enfin, la place de Fabrica confirme que la question des environnements ne peut
+pas être dissociée de celle des données. Les environnements temporaires,
+complets et alimentés par des données proches de la production offrent un cadre
+de validation plus crédible que des setups locaux simplifiés. Mais ils
+révèlent aussi plus tôt les dépendances réelles du système. Tant que le seeding
+reste partiel, que la réindexation n'est pas pilotable de façon programmée et
+que certaines suites conservent des préconditions implicites, l'environnement
+réaliste ne supprime pas la fragilité ; il la rend plus visible. L'effet
+business est ambivalent : l'entreprise dispose d'un levier puissant pour
+rapprocher la validation du réel, mais ne capte pas encore tout son bénéfice
+faute d'un outillage de préparation suffisamment homogène.
+
 === Limites de l'observabilité et du diagnostic
 
+Le second foyer de fragilité concerne l'observabilité. Les outils existent déjà
+dans plusieurs couches du système : Sentry est intégré aux frontends et au
+backend, tandis que CloudWatch est identifié comme support de centralisation des
+logs applicatifs. Pourtant, les travaux encore ouverts montrent que cette
+présence ne suffit pas à garantir un diagnostic efficace. Le besoin exprimé
+pour Sentry est explicite : être capable d'identifier le service ou l'endpoint
+responsable d'un bug en production. Une telle formulation indique que
+l'information actuellement remontée reste encore trop partielle pour orienter
+rapidement l'investigation. L'outil est présent, mais sa valeur opérationnelle
+reste en deçà de ce que demanderait un système réparti sur de nombreux
+microservices.
+
+Cette limite doit être lue à l'échelle de l'architecture. Dans le backend,
+quatorze domaines applicatifs coexistent avec plusieurs mécanismes de stockage,
+de messagerie et de recherche. Une erreur visible côté front ou côté backoffice
+peut donc provenir d'un service métier, d'une intégration, d'un défaut de
+sérialisation, d'une rupture de communication ou d'un problème d'indexation.
+Dans un tel contexte, un signal d'erreur dépourvu de contexte précis ne réduit
+que faiblement l'espace des causes possibles. Il attire l'attention, mais ne
+permet pas encore de localiser rapidement la responsabilité technique. Le temps
+d'analyse reste alors largement dépendant de la capacité des équipes à croiser
+plusieurs sources, à connaître l'architecture et à reconstituer le parcours
+ayant mené à l'incident.
+
+Le sujet CloudWatch révèle une difficulté voisine sous un autre angle. Là
+encore, l'enjeu n'est pas simplement de disposer de logs, mais de consolider
+ceux de toutes les applications, de maîtriser le niveau de verbosité en
+production et d'y faire apparaître des informations utiles à l'analyse. Cela
+suggère qu'à ce stade, les journaux restent soit incomplets, soit dispersés,
+soit insuffisamment structurés pour réduire efficacement le temps de diagnostic.
+Dans la pratique, une observabilité partielle produit un coût caché : chaque
+incident mobilise davantage de conversations, de recoupements et de vérifications
+manuelles. Le problème n'est donc pas l'absence d'instrumentation, mais le fait
+que les signaux n'ont pas encore un niveau de précision et de centralisation
+suffisant pour devenir des supports de décision rapides.
+
 === Conséquences opérationnelles, économiques et organisationnelles des limites identifiées
+
+Pris ensemble, ces constats dessinent un même mécanisme de perte d'efficacité.
+Du côté des validations, l'instabilité des suites et la dépendance aux
+préconditions implicites allongent le temps nécessaire pour conclure qu'une
+évolution est réellement sûre. Du côté du diagnostic, la lisibilité encore
+insuffisante des signaux d'erreur et des logs retarde la compréhension des
+incidents qui échappent malgré tout aux vérifications préalables. Dans les deux
+cas, l'organisation paie moins un coût spectaculaire qu'un coût de friction
+répété : relances, retests, arbitrages prudents, sollicitations croisées et
+temps perdu à reconstruire le contexte.
+
+Les conséquences opérationnelles sont directes. Une suite E2E peu fiable réduit
+la fluidité des merges et entretient une dépendance aux vérifications
+manuelles. Une recherche non réindexée après seeding peut invalider un scénario
+pour des raisons périphériques au comportement réellement testé. Un signal
+Sentry trop peu contextualisé peut obliger à relire des logs multiples avant
+d'isoler le service en cause. Chacun de ces écarts est supportable isolément,
+mais leur accumulation dans un environnement de livraison actif finit par peser
+sur le débit global de l'équipe. Le temps d'ingénierie cesse alors d'être
+consacré prioritairement à la production de valeur nouvelle et se répartit en
+part croissante entre prévention imparfaite, interprétation des résultats et
+investigation corrective.
+
+L'effet économique doit également être souligné, même en l'absence de chiffrage
+fin dans le dépôt. Un test fiable ou un diagnostic rapide ne produisent pas
+seulement un gain technique ; ils évitent la mobilisation simultanée de plusieurs
+profils sur une même incertitude. À l'inverse, chaque incident mal localisé ou
+chaque validation contestable augmente le coût unitaire d'une livraison ou
+d'une anomalie, parce qu'il multiplie les échanges, les reprises et les délais
+d'attente. Dans une entreprise dont la valeur dépend de la continuité entre
+plateforme publique, outils internes, microservices et recherche, ces surcoûts
+organisationnels finissent par toucher la qualité de service elle-même. Le
+diagnostic des fragilités actuelles ne renvoie donc pas à un simple confort de
+développement. Il met au jour des obstacles concrets à la scalabilité du mode
+de fonctionnement collectif.
 
 == Premier levier : fiabiliser les validations pour fluidifier la livraison
 
