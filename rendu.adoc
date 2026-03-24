@@ -11,57 +11,163 @@ Author Name
 
 === Presentation du sujet
 
-La mission examinee dans ce rapport s'inscrit dans un cadre de fiabilite operationnelle applique a un systeme logiciel distribue. Le depot fourni ne decrit pas une application isolee, mais un ensemble de composants complementaires qui participent a une meme chaine de valeur. D'un cote, `projects/lehibou-front` constitue la surface publique la plus visible, avec des parcours de recherche, d'inscription, de consultation de profils, de publication d'annonces et d'acces a des espaces authentifies. De l'autre, `projects/lehibou-back` se presente explicitement comme un ecosysteme d'API compose de quatorze microservices communiquant notamment par gRPC et RabbitMQ, ce qui signale un niveau de couplage fonctionnel et technique bien plus eleve qu'un backend monolithique classique. Enfin, `projects/lehibou-fabrica` apporte une couche d'infrastructure operationnelle en permettant de creer des environnements AWS ephemeres, complets et alimentes par des donnees de production restaurees. L'objet de la mission ne peut donc pas etre compris uniquement comme un travail de tests ou de supervision pris separement ; il concerne la capacite d'un ensemble applicatif complexe a etre valide, observe et maintenu avec un niveau de confiance compatible avec son usage reel.
+La mission etudiee s'inscrit dans un contexte ou la fiabilite
+operationnelle ne releve pas d'un simple enjeu de confort technique, mais
+constitue une condition directe de fluidite pour l'activite de l'entreprise.
+Le systeme observe ne correspond pas a une application isolee. Il repose sur
+un ensemble de frontends, de services metier, d'integrations et d'outils de
+plateforme dont la coordination conditionne la qualite du service rendu. Dans
+un tel cadre, une regression non detectee, un environnement de validation
+incomplet ou une erreur de production mal contextualisee ont des effets qui
+depassent largement le seul correctif logiciel. Ils ralentissent les mises a
+jour, mobilisent plusieurs equipes et augmentent le cout des operations de
+verification comme des investigations correctives.
 
-L'analyse des sources montre que la fiabilite des validations constitue ici un point d'entree concret. Les tickets `issues/end-to-end/23.md` et `issues/end-to-end/24.md` relient directement la stabilisation des tests end-to-end a un objectif d'automatisation du flux de deploiement, en particulier apres fusion sur `develop`. Cette formulation est importante, car elle deplace le sujet des tests du seul registre de la qualite interne vers celui de la fluidite operationnelle. Tant que les suites de validation demeurent instables, difficiles a executer sur certaines machines ou dependantes d'un contexte technique implicite, elles ne peuvent pas jouer leur role de garde-fou dans le cycle de livraison. La qualite logicielle n'est alors plus seulement affaire de couverture ou de bonnes pratiques, mais de reproductibilite des scenarios, de maitrise des preconditions et de capacite a produire un signal exploitable au bon moment.
+Cette situation est particulierement nette dans l'ecosysteme technique de
+LeHibou. Le backend central repose sur une organisation en microservices,
+articulee autour de nombreux domaines metier, de mecanismes de communication
+par gRPC et RabbitMQ, ainsi que de dependances vers la recherche, les bases de
+donnees et plusieurs services tiers. Les interfaces frontales, qu'elles soient
+tournees vers les utilisateurs ou vers les equipes internes, dependent de cet
+ensemble pour exposer des parcours coherents. Dans un tel dispositif, la
+qualite logicielle ne peut pas etre appreciee seulement a l'echelle d'un
+module. Elle suppose des validations de bout en bout capables de verifier des
+chaines fonctionnelles completes, mais aussi des outils d'observabilite
+permettant de comprendre rapidement ce qui se degrade lorsqu'un incident
+survient.
 
-Les elements consultes indiquent egalement que la mission ne se limite pas a fiabiliser des parcours existants. Plusieurs tickets du backend consacres au Seeder API, comme `issues/lehibou-back/1708.md`, `issues/lehibou-back/1714.md` et `issues/lehibou-back/1717.md`, montrent qu'un effort structurel est engage pour sortir des fixtures statiques et construire des donnees de test de maniere programmatique, jusque dans les dimensions transverses que sont les donnees de reference, les alertes metier ou la reindexation de la recherche. Cette orientation revele une difficulte classique des systemes distribues : un test end-to-end devient fragile non seulement quand l'interface change, mais aussi lorsque l'etat des donnees, des index, des connexions inter-services ou des roles utilisateur ne peut pas etre reconstruit proprement. Autrement dit, la question de la validation est inseparable de celle de la preparation de l'environnement et de l'orchestration des dependances.
+Le point d'entree retenu pour la mission est celui des tests end-to-end. Ce
+choix n'est pas anodin. Les travaux disponibles montrent que l'automatisation
+de ces verifications reste partiellement fragile, notamment lorsqu'il s'agit
+de les executer dans des conditions proches du reel ou de maitriser
+correctement les donnees necessaires aux scenarios. Or, pour qu'un test
+end-to-end joue pleinement son role, il ne suffit pas qu'il existe. Il doit
+etre suffisamment reproductible pour etre relance sans intervention lourde,
+suffisamment robuste pour inspirer confiance, et suffisamment integre au cycle
+de livraison pour detecter les regressions avant qu'elles ne se transforment
+en incidents visibles. C'est dans cette perspective qu'apparaissent des
+outils transverses comme Fabrica, qui permet de creer des environnements
+temporaires complets avec des donnees proches de la realite, ou encore le
+service de seeding, destine a fiabiliser la preparation des jeux de donnees.
 
-Dans le meme temps, les documents consultes font apparaitre un second axe, celui de l'observabilite. Le ticket `issues/lehibou-back/1694.md` vise a rendre Sentry suffisamment informatif pour identifier le service ou l'endpoint responsable d'un incident en production, tandis que `issues/lehibou-infra/48.md` cherche a mieux structurer les logs des applications dans CloudWatch. Le probleme n'est donc pas seulement de detecter qu'un dysfonctionnement existe, mais de disposer de traces suffisamment lisibles pour comprendre rapidement son origine. Ce glissement est central dans un contexte ou la plateforme articule plusieurs frontends, de multiples services backend et des environnements ephemeres. Une validation plus fiable en amont reduit une partie du risque, mais elle n'annule pas la necessite d'un diagnostic efficace lorsque des incidents surviennent en aval. La mission etudiee prend ainsi place a l'intersection de trois exigences complementaires : verifier plus tot, comprendre plus vite et reduire le cout global des anomalies.
+Cependant, la prevention par les tests ne suffit pas a elle seule. Meme dans
+un dispositif de validation renforce, certaines erreurs demeurent visibles
+seulement une fois le systeme confronte a ses usages effectifs, a ses
+volumes, a ses integrations ou a la variabilite de ses environnements. C'est
+pour cette raison que la mission prolonge le travail sur les validations par
+une reflexion sur le monitoring et la lisibilite des incidents. La presence de
+Sentry dans plusieurs composants du backend comme dans le frontend montre que
+l'outillage d'observabilite existe deja. Pour autant, les besoins formules
+indiquent que cet outillage n'est pas encore suffisamment exploitable pour
+identifier sans ambiguite le service ou l'endpoint responsable d'un bug. La
+question n'est donc pas seulement de collecter davantage de signaux, mais de
+rendre ces signaux actionnables dans des temps compatibles avec l'exploitation
+quotidienne.
 
-Le sujet peut donc etre formule de maniere precise : il s'agit d'ameliorer la fiabilite operationnelle de l'ecosysteme LeHibou en agissant d'abord sur la stabilisation des tests end-to-end, puis sur le renforcement progressif des dispositifs de monitoring et de lecture des incidents. Ce choix n'a rien d'abstrait. Il repond a des difficultes observees dans les sources du depot : dependance a des fixtures difficiles a maintenir, besoin de seeding plus robuste, necessite de reindexer la recherche apres generation de donnees, execution des tests dans des environnements realistes via Fabrica, et insuffisante exploitabilite des signaux envoyes a Sentry ou CloudWatch. Le fil directeur du rapport sera donc moins celui d'une accumulation d'outils que celui d'une progression vers un systeme de validation et de diagnostic plus coherent avec la complexite reelle de la plateforme.
+Ainsi, le sujet de ce rapport se situe a l'intersection de trois dimensions
+etroitement liees. La premiere est la fiabilite des validations, c'est-a-dire
+la capacite a verifier regulierement des parcours applicatifs representatifs.
+La deuxieme est l'observabilite, entendue comme l'aptitude du systeme a rendre
+ses defaillances lisibles et attribuables. La troisieme est la maitrise des
+couts, non seulement au sens financier, mais aussi au sens organisationnel :
+temps passe a reproduire, a reindexer manuellement, a relancer des campagnes
+de test, ou a mobiliser plusieurs intervenants pour localiser l'origine d'une
+erreur. L'hypothese directrice de la mission est qu'une amelioration combinee
+de ces trois dimensions permet de renforcer la qualite des livraisons sans
+multiplier les controles manuels ni alourdir artificiellement la chaine
+technique.
 
 === Problematique
 
-La problematique generale du rapport tient a une tension frequente dans les organisations logicielles en croissance : plus le systeme gagne en richesse fonctionnelle, en decoupage technique et en interactions entre composants, plus il devient difficile d'obtenir une validation fiable et un diagnostic rapide sans multiplier les couts de coordination. Les documents consultes montrent que cette tension est presente a plusieurs niveaux chez LeHibou. Le front public concentre des parcours varies, qui vont de l'acquisition marketing a des usages plus applicatifs comme la recherche, les alertes, les candidatures ou les espaces authentifies. Le backend, quant a lui, centralise des responsabilites nombreuses autour des utilisateurs, des missions, de la recherche, des notifications et des integrations. Dans un tel cadre, une regression ne se limite pas a un defaut d'affichage ou a une erreur localisee : elle peut resulter d'un enchainement de dependances entre donnees, services, index et roles metier.
+La problematique generale peut donc etre formulee de la maniere suivante :
+comment fiabiliser les validations du systeme tout en ameliorant la capacite
+de diagnostic lors des incidents, afin de reduire les frictions
+operationnelles et les couts associes ? Cette formulation met deliberement en
+relation deux difficultes souvent traitees separement. D'un cote, des tests
+end-to-end insuffisamment stables ou trop dependants de manipulations
+specifiques ne jouent qu'imparfaitement leur role de filet de securite. De
+l'autre, une observabilite insuffisamment contextualisee allonge le temps
+necessaire pour comprendre une anomalie et identifier le composant en cause.
+Dans les deux cas, le resultat est comparable : la verification se deplace
+vers l'humain, avec davantage d'incertitude, davantage d'attente et un risque
+plus fort de laisser subsister des zones de doute.
 
-La premiere question est donc celle de la fiabilisation du systeme de validation. Les tickets de l'espace `issues/end-to-end/` montrent que les suites actuelles ne sont pas encore dans un etat permettant une automatisation sereine du flux de deploiement. Le point souleve dans `issues/end-to-end/23.md`, qui mentionne des tests ne fonctionnant pas sur certaines machines et la necessite de les executer sur un environnement Fabrica, suggere que le probleme n'est pas seulement fonctionnel. Il touche a la reproductibilite des executions, a la maitrise des environnements et a la qualite des preconditions de test. Le ticket `issues/end-to-end/26.md` renforce ce constat en demandant l'harmonisation d'un socle commun de seeding et de login, avec un recours explicite a `cy.task(...)` et `cy.loginByApi(...)` ainsi qu'une reduction des credentials partages. Cela indique que la fragilite provient aussi d'une dette de structuration dans les suites elles-memes : quand les roles, les alias, les comptes et les donnees ne sont pas normalises, l'echec d'un scenario devient difficile a attribuer, a corriger et a prevenir.
+Les difficultes documentees autour des validations illustrent bien cette
+tension. L'execution des tests sur des environnements realistes apparait comme
+un objectif central, mais elle suppose de surmonter plusieurs dependances :
+stabilite variable selon les postes ou les contextes d'execution, besoin de
+preparer rapidement des donnees adequates, et necessite de remettre a jour les
+indexes de recherche apres certains seedings pour eviter des resultats
+incoherents. Ces contraintes montrent qu'un test end-to-end n'est jamais
+seulement un script de verification. Il depend d'une chaine de preconditions
+infrastructurelles et applicatives qui, si elle reste partiellement manuelle,
+affaiblit la promesse d'automatisation.
 
-Une seconde question porte sur le rapport entre donnees de test et environnements realistes. Les tickets backend relatifs au Seeder API montrent que le simple maintien d'un dossier de fixtures statiques ne suffit plus. `issues/lehibou-back/1708.md` precise que les donnees de reference sont des prerequis pour de nombreuses autres entites, tandis que `issues/lehibou-back/1717.md` souligne qu'apres un seeding de donnees, les index de recherche doivent etre remis a jour faute de quoi les tests renvoient des resultats incoherents. L'enseignement principal est que la qualite d'une validation end-to-end ne depend pas uniquement du script de test, mais de la maitrise de tout l'etat systeme necessaire a son execution. Or, plus cet etat repose sur des manipulations manuelles ou des conditions implicites, plus l'automatisation devient couteuse et peu fiable. La problematique peut donc etre reformulee ainsi : comment produire des scenarios end-to-end autonomes, reproductibles et suffisamment proches des usages reels pour constituer un signal de confiance exploitable dans le cycle de livraison ?
+La problematique d'observabilite repond a une logique voisine. Le systeme
+dispose deja de mecanismes de remontee d'erreurs et de traces, y compris dans
+des couches transverses du backend. Toutefois, les attentes exprimees autour
+de Sentry montrent qu'il ne suffit pas de capter une exception pour rendre le
+diagnostic efficace. Encore faut-il pouvoir rattacher rapidement cette
+exception a un service, a un endpoint ou a un flux technique identifiable.
+Sans cette capacite, l'information remontee reste partiellement abstraite et
+ne reduit que faiblement le temps d'investigation. Autrement dit, la
+problematique ne porte pas seulement sur l'existence d'outils de monitoring,
+mais sur leur qualite informationnelle et sur leur integration dans les usages
+des equipes.
 
-La troisieme question concerne l'observabilite et la capacite de diagnostic. Les sources disponibles suggerent que meme si les validations sont renforcees, une partie du risque restera de toute facon traitee en exploitation. Le ticket `issues/lehibou-back/1694.md` indique que Sentry doit devenir assez precis pour identifier le service ou l'endpoint responsable d'un bug en production. En parallele, `issues/lehibou-infra/48.md` appelle a une amelioration du systeme de logs CloudWatch, y compris sur la selection du niveau de verbosite en production. Ces formulations montrent que le sujet ne consiste pas seulement a "avoir des logs", mais a rendre ces traces utilisables dans un contexte multi-services. Lorsqu'un incident touche une plateforme ou s'enchainent frontends, API, recherche, notifications et environnements ephemeres, une observabilite partielle allonge les investigations, multiplie les retests et deplace la charge de comprehension vers des analyses manuelles couteuses.
-
-Des lors, la problematique du rapport peut etre exprimee de facon unifiee : comment fiabiliser les validations end-to-end, mieux diagnostiquer les incidents et articuler ces deux axes dans une meme demarche de reduction du risque et de maitrise des couts ? Le lien entre ces dimensions est essentiel. Un dispositif de test instable oblige a repeter des verifications manuelles et retarde la detection des regressions. A l'inverse, une observabilite peu lisible allonge le temps necessaire pour comprendre les anomalies qui echappent aux tests ou qui n'apparaissent qu'en conditions reelles. Dans les deux cas, le cout n'est pas uniquement technique. Il prend aussi la forme d'un temps d'investigation plus long, d'une moindre confiance dans les mises en production et d'une mobilisation accrue des equipes autour de taches de verification ou de diagnostic qui devraient etre davantage outillees.
+Le coeur de la mission consiste donc a articuler prevention et diagnostic dans
+une meme demarche. Renforcer les tests end-to-end permet de detecter plus tot
+certaines regressions. Mieux structurer le monitoring permet de comprendre plus
+vite celles qui echappent encore a la validation prealable. L'enjeu n'est pas
+de viser une elimination totale du risque, objectif peu realiste dans un
+ecosysteme distribue, mais de diminuer conjointement la probabilite de
+survenue des dysfonctionnements et le cout de leur traitement. C'est cette
+double exigence qui donne sa coherence a la problematique du rapport.
 
 === Demarche retenue
 
-Face a cette problematique, la demarche retenue dans ce rapport repose sur un decoupage volontaire en deux temps, correspondant a deux niveaux d'action complementaires. Le premier consiste a stabiliser les tests end-to-end existants et a renforcer les conditions de leur execution. Le second prolonge ce travail en abordant l'amelioration progressive du monitoring et de la lisibilite des incidents. Ce choix ne releve pas d'une juxtaposition de chantiers independants. Il traduit au contraire une progression logique : tant que les validations ne produisent pas un signal suffisamment fiable dans les environnements de test, il est difficile de distinguer ce qui releve d'une regression fonctionnelle, d'un probleme de donnees, d'une faiblesse de l'orchestration technique ou d'un incident observable en exploitation. Stabiliser l'amont permet donc de clarifier le role de l'aval.
+Pour repondre a cette problematique, la demarche retenue suit une progression
+volontairement pragmatique. Elle commence par la stabilisation des tests
+end-to-end, puis se prolonge par le renforcement progressif du monitoring. Ce
+decoupage ne correspond pas a une juxtaposition de chantiers independants. Il
+traduit au contraire une logique de priorisation. Tant que les validations de
+bout en bout demeurent trop fragiles, une partie des regressions continue
+d'etre detectee tardivement, parfois dans des conditions difficiles a
+reproduire. Restaurer de la confiance dans ces verifications constitue donc le
+premier levier d'amelioration.
 
-Le premier volet de la demarche s'appuie sur les indices convergents fournis par les tickets end-to-end et backend. D'un cote, `issues/end-to-end/23.md`, `issues/end-to-end/24.md`, `issues/end-to-end/26.md` et `issues/end-to-end/29.md` montrent que l'objectif n'est pas seulement de "corriger quelques tests", mais de rendre les scenarios autonomes, lisibles et capables d'etre rejoues dans un flux de deploiement plus automatise. De l'autre, les tickets du Seeder API mettent en evidence les prerequis techniques d'une telle stabilisation : generation dynamique des donnees de reference, creation d'entites metier necessaires aux parcours, gestion de plusieurs connexions a des bases distinctes, et reindexation de la recherche apres seeding. La demarche analysera donc la fiabilisation des tests comme un probleme systemique. Elle ne sera pas reduite a la seule ecriture des specifications Cypress, mais envisagera aussi le seeding, l'isolement des scenarios, l'elimination des preconditions implicites et l'usage d'environnements Fabrica pour rapprocher les executions de conditions realistes.
+Cette premiere phase conduit a examiner les causes concretes d'instabilite :
+dependance excessive aux donnees existantes, couplage entre fixtures et acces
+directs aux bases, execution encore partiellement manuelle, et besoin
+d'environnements suffisamment representatifs pour reproduire des parcours
+metier credibles. L'interet d'outils comme Fabrica et du seeding apparait ici
+comme structurant. Les environnements ephemeres permettent de rapprocher la
+validation des conditions reelles sans immobiliser durablement une plateforme
+partagee. Le seeding, quant a lui, deplace la preparation des donnees vers une
+logique plus explicite, plus reutilisable et potentiellement plus maintenable.
+La demarche consiste donc a transformer un ensemble de tests heterogenes en un
+dispositif de verification plus reproductible, capable a terme de s'inserer de
+maniere plus naturelle dans le cycle de livraison.
 
-Le recours a Fabrica occupe ici une place particuliere. Le README du projet precise que ces environnements ephemeres embarquent une plateforme complete, des microservices multiples et des donnees de production restaurees, avec un nettoyage automatique destine a limiter les couts. Cette caracteristique en fait un terrain intermediaire entre le developpement local et la production. Pour le rapport, Fabrica ne sera donc pas seulement presente comme un outil d'infrastructure, mais comme un levier methodologique : elle permet de verifier les parcours sur des contextes plus riches qu'un environnement minimal, tout en gardant la reproductibilite necessaire a une validation de branche ou de merge request. En ce sens, l'integration des tests end-to-end a des environnements ephemeres n'est pas un detail d'implementation ; elle participe directement a la credibilite du signal de validation.
+Une fois ce premier socle consolide, le second axe porte sur l'amelioration de
+la lisibilite des incidents. L'objectif n'est pas seulement d'ajouter des logs
+supplementaires, mais d'accroitre la valeur diagnostique des informations
+remontees. Dans un systeme compose de nombreux services, la question decisive
+est souvent moins de constater qu'une erreur existe que d'identifier
+rapidement ou elle se produit et dans quel enchainement technique elle
+s'inscrit. Le travail sur le monitoring prend alors le relais du travail sur
+les tests : la validation reduit l'exposition aux regressions evitables, tandis
+que l'observabilite accelere le traitement des defaillances residuelles.
 
-Le second volet de la demarche porte sur le monitoring. Une fois les validations davantage stabilisees, l'enjeu devient de mieux exploiter les traces issues du systeme en fonctionnement. Le rapport abordera alors l'articulation entre CloudWatch, qui concentre une partie de la collecte de logs d'infrastructure et d'applications, et Sentry, dont l'amelioration est explicitement visee pour identifier les services et endpoints responsables des bugs. La logique suivie sera celle d'un renforcement progressif, et non d'une refonte totale. Les sources ne permettent pas d'affirmer qu'un dispositif unifie et complet est deja en place ; elles montrent plutot des chantiers ouverts pour rendre les signaux existants plus exploitables. Il sera donc plus juste d'analyser ce second axe comme une montee en lisibilite du diagnostic, venant completer le travail mene sur la prevention par les tests.
-
-Ce decoupage en deux temps presente enfin un interet argumentatif pour l'ensemble du rapport. Il permet d'eviter deux simplifications frequentes. La premiere consisterait a penser que des tests plus nombreux suffisent a securiser la plateforme, alors que les sources montrent au contraire l'importance des donnees, des environnements et des dependances inter-services. La seconde serait d'imaginer que l'observabilite compense a elle seule les limites de la validation, alors qu'un monitoring performant ne remplace ni des scenarios de non-regression fiables ni une preparation correcte de l'etat systeme. La demarche retenue defend donc une these plus nuancee : la fiabilite operationnelle s'obtient par complementarite entre prevention et diagnostic. C'est parce que la validation automatisee et l'observabilite sont traitees comme deux maillons d'une meme chaine qu'elles peuvent contribuer ensemble a une meilleure maitrise des delais d'analyse, des interventions manuelles et, en definitive, des couts associes aux incidents et aux regressions.
-
-==== References mobilisees
-
-- `rendu.md`
-- `summaries/lehibou-front-summary.md`
-- `summaries/lehibou-back-summary.md`
-- `summaries/lehibou-fabrica-summary.md`
-- `projects/lehibou-back/README.md`
-- `projects/lehibou-fabrica/README.md`
-- `issues/end-to-end/23.md`
-- `issues/end-to-end/24.md`
-- `issues/end-to-end/26.md`
-- `issues/end-to-end/29.md`
-- `issues/lehibou-back/1694.md`
-- `issues/lehibou-back/1708.md`
-- `issues/lehibou-back/1714.md`
-- `issues/lehibou-back/1717.md`
-- `issues/lehibou-infra/48.md`
+Le plan du rapport suit cette logique. Apres avoir cadre le contexte de
+l'entreprise et les enjeux operationnels associes a son ecosysteme technique,
+le rapport etablit un diagnostic des limites actuelles, d'abord du cote des
+validations, puis du cote de l'observabilite. Il presente ensuite les leviers
+de stabilisation des tests end-to-end avant d'aborder le renforcement du
+monitoring. L'ensemble vise a montrer qu'une demarche de fiabilite
+operationnelle gagne en efficacite lorsqu'elle articule les phases de
+prevention, de detection et de diagnostic au lieu de les traiter comme des
+problemes isoles.
 
 == Contexte de l'entreprise et enjeux operationnels
 
