@@ -1,4 +1,4 @@
-= Amelioration de la fiabilite operationnelle chez LeHibou : tests end-to-end, observabilite et maitrise des couts
+= Faire de la fiabilite operationnelle un levier intrapreneurial chez LeHibou : stabilisation des tests end-to-end, observabilite et maitrise des couts
 Author Name
 :doctype: article
 :toc:
@@ -11,165 +11,11 @@ Author Name
 
 === Presentation du sujet
 
-La mission etudiee s'inscrit dans un contexte ou la fiabilite
-operationnelle ne releve pas d'un simple enjeu de confort technique, mais
-constitue une condition directe de fluidite pour l'activite de l'entreprise.
-Le systeme observe ne correspond pas a une application isolee. Il repose sur
-un ensemble de frontends, de services metier, d'integrations et d'outils de
-plateforme dont la coordination conditionne la qualite du service rendu. Dans
-un tel cadre, une regression non detectee, un environnement de validation
-incomplet ou une erreur de production mal contextualisee ont des effets qui
-depassent largement le seul correctif logiciel. Ils ralentissent les mises a
-jour, mobilisent plusieurs equipes et augmentent le cout des operations de
-verification comme des investigations correctives.
-
-Cette situation est particulierement nette dans l'ecosysteme technique de
-LeHibou. Le backend central repose sur une organisation en microservices,
-articulee autour de nombreux domaines metier, de mecanismes de communication
-par gRPC et RabbitMQ, ainsi que de dependances vers la recherche, les bases de
-donnees et plusieurs services tiers. Les interfaces frontales, qu'elles soient
-tournees vers les utilisateurs ou vers les equipes internes, dependent de cet
-ensemble pour exposer des parcours coherents. Dans un tel dispositif, la
-qualite logicielle ne peut pas etre appreciee seulement a l'echelle d'un
-module. Elle suppose des validations de bout en bout capables de verifier des
-chaines fonctionnelles completes, mais aussi des outils d'observabilite
-permettant de comprendre rapidement ce qui se degrade lorsqu'un incident
-survient.
-
-Le point d'entree retenu pour la mission est celui des tests end-to-end. Ce
-choix n'est pas anodin. Les travaux disponibles montrent que l'automatisation
-de ces verifications reste partiellement fragile, notamment lorsqu'il s'agit
-de les executer dans des conditions proches du reel ou de maitriser
-correctement les donnees necessaires aux scenarios. Or, pour qu'un test
-end-to-end joue pleinement son role, il ne suffit pas qu'il existe. Il doit
-etre suffisamment reproductible pour etre relance sans intervention lourde,
-suffisamment robuste pour inspirer confiance, et suffisamment integre au cycle
-de livraison pour detecter les regressions avant qu'elles ne se transforment
-en incidents visibles. C'est dans cette perspective qu'apparaissent des
-outils transverses comme Fabrica, qui permet de creer des environnements
-temporaires complets avec des donnees proches de la realite, ou encore le
-service de seeding, destine a fiabiliser la preparation des jeux de donnees.
-
-Cependant, la prevention par les tests ne suffit pas a elle seule. Meme dans
-un dispositif de validation renforce, certaines erreurs demeurent visibles
-seulement une fois le systeme confronte a ses usages effectifs, a ses
-volumes, a ses integrations ou a la variabilite de ses environnements. C'est
-pour cette raison que la mission prolonge le travail sur les validations par
-une reflexion sur le monitoring et la lisibilite des incidents. La presence de
-Sentry dans plusieurs composants du backend comme dans le frontend montre que
-l'outillage d'observabilite existe deja. Pour autant, les besoins formules
-indiquent que cet outillage n'est pas encore suffisamment exploitable pour
-identifier sans ambiguite le service ou l'endpoint responsable d'un bug. La
-question n'est donc pas seulement de collecter davantage de signaux, mais de
-rendre ces signaux actionnables dans des temps compatibles avec l'exploitation
-quotidienne.
-
-Ainsi, le sujet de ce rapport se situe a l'intersection de trois dimensions
-etroitement liees. La premiere est la fiabilite des validations, c'est-a-dire
-la capacite a verifier regulierement des parcours applicatifs representatifs.
-La deuxieme est l'observabilite, entendue comme l'aptitude du systeme a rendre
-ses defaillances lisibles et attribuables. La troisieme est la maitrise des
-couts, non seulement au sens financier, mais aussi au sens organisationnel :
-temps passe a reproduire, a reindexer manuellement, a relancer des campagnes
-de test, ou a mobiliser plusieurs intervenants pour localiser l'origine d'une
-erreur. L'hypothese directrice de la mission est qu'une amelioration combinee
-de ces trois dimensions permet de renforcer la qualite des livraisons sans
-multiplier les controles manuels ni alourdir artificiellement la chaine
-technique.
-
 === Problematique
-
-La problematique generale peut donc etre formulee de la maniere suivante :
-comment fiabiliser les validations du systeme tout en ameliorant la capacite
-de diagnostic lors des incidents, afin de reduire les frictions
-operationnelles et les couts associes ? Cette formulation met deliberement en
-relation deux difficultes souvent traitees separement. D'un cote, des tests
-end-to-end insuffisamment stables ou trop dependants de manipulations
-specifiques ne jouent qu'imparfaitement leur role de filet de securite. De
-l'autre, une observabilite insuffisamment contextualisee allonge le temps
-necessaire pour comprendre une anomalie et identifier le composant en cause.
-Dans les deux cas, le resultat est comparable : la verification se deplace
-vers l'humain, avec davantage d'incertitude, davantage d'attente et un risque
-plus fort de laisser subsister des zones de doute.
-
-Les difficultes documentees autour des validations illustrent bien cette
-tension. L'execution des tests sur des environnements realistes apparait comme
-un objectif central, mais elle suppose de surmonter plusieurs dependances :
-stabilite variable selon les postes ou les contextes d'execution, besoin de
-preparer rapidement des donnees adequates, et necessite de remettre a jour les
-indexes de recherche apres certains seedings pour eviter des resultats
-incoherents. Ces contraintes montrent qu'un test end-to-end n'est jamais
-seulement un script de verification. Il depend d'une chaine de preconditions
-infrastructurelles et applicatives qui, si elle reste partiellement manuelle,
-affaiblit la promesse d'automatisation.
-
-La problematique d'observabilite repond a une logique voisine. Le systeme
-dispose deja de mecanismes de remontee d'erreurs et de traces, y compris dans
-des couches transverses du backend. Toutefois, les attentes exprimees autour
-de Sentry montrent qu'il ne suffit pas de capter une exception pour rendre le
-diagnostic efficace. Encore faut-il pouvoir rattacher rapidement cette
-exception a un service, a un endpoint ou a un flux technique identifiable.
-Sans cette capacite, l'information remontee reste partiellement abstraite et
-ne reduit que faiblement le temps d'investigation. Autrement dit, la
-problematique ne porte pas seulement sur l'existence d'outils de monitoring,
-mais sur leur qualite informationnelle et sur leur integration dans les usages
-des equipes.
-
-Le coeur de la mission consiste donc a articuler prevention et diagnostic dans
-une meme demarche. Renforcer les tests end-to-end permet de detecter plus tot
-certaines regressions. Mieux structurer le monitoring permet de comprendre plus
-vite celles qui echappent encore a la validation prealable. L'enjeu n'est pas
-de viser une elimination totale du risque, objectif peu realiste dans un
-ecosysteme distribue, mais de diminuer conjointement la probabilite de
-survenue des dysfonctionnements et le cout de leur traitement. C'est cette
-double exigence qui donne sa coherence a la problematique du rapport.
 
 === Demarche retenue
 
-Pour repondre a cette problematique, la demarche retenue suit une progression
-volontairement pragmatique. Elle commence par la stabilisation des tests
-end-to-end, puis se prolonge par le renforcement progressif du monitoring. Ce
-decoupage ne correspond pas a une juxtaposition de chantiers independants. Il
-traduit au contraire une logique de priorisation. Tant que les validations de
-bout en bout demeurent trop fragiles, une partie des regressions continue
-d'etre detectee tardivement, parfois dans des conditions difficiles a
-reproduire. Restaurer de la confiance dans ces verifications constitue donc le
-premier levier d'amelioration.
-
-Cette premiere phase conduit a examiner les causes concretes d'instabilite :
-dependance excessive aux donnees existantes, couplage entre fixtures et acces
-directs aux bases, execution encore partiellement manuelle, et besoin
-d'environnements suffisamment representatifs pour reproduire des parcours
-metier credibles. L'interet d'outils comme Fabrica et du seeding apparait ici
-comme structurant. Les environnements ephemeres permettent de rapprocher la
-validation des conditions reelles sans immobiliser durablement une plateforme
-partagee. Le seeding, quant a lui, deplace la preparation des donnees vers une
-logique plus explicite, plus reutilisable et potentiellement plus maintenable.
-La demarche consiste donc a transformer un ensemble de tests heterogenes en un
-dispositif de verification plus reproductible, capable a terme de s'inserer de
-maniere plus naturelle dans le cycle de livraison.
-
-Une fois ce premier socle consolide, le second axe porte sur l'amelioration de
-la lisibilite des incidents. L'objectif n'est pas seulement d'ajouter des logs
-supplementaires, mais d'accroitre la valeur diagnostique des informations
-remontees. Dans un systeme compose de nombreux services, la question decisive
-est souvent moins de constater qu'une erreur existe que d'identifier
-rapidement ou elle se produit et dans quel enchainement technique elle
-s'inscrit. Le travail sur le monitoring prend alors le relais du travail sur
-les tests : la validation reduit l'exposition aux regressions evitables, tandis
-que l'observabilite accelere le traitement des defaillances residuelles.
-
-Le plan du rapport suit cette logique. Apres avoir cadre le contexte de
-l'entreprise et les enjeux operationnels associes a son ecosysteme technique,
-le rapport etablit un diagnostic des limites actuelles, d'abord du cote des
-validations, puis du cote de l'observabilite. Il presente ensuite les leviers
-de stabilisation des tests end-to-end avant d'aborder le renforcement du
-monitoring. L'ensemble vise a montrer qu'une demarche de fiabilite
-operationnelle gagne en efficacite lorsqu'elle articule les phases de
-prevention, de detection et de diagnostic au lieu de les traiter comme des
-problemes isoles.
-
-== Contexte de l'entreprise et enjeux operationnels
+== Contexte de l'entreprise et opportunite intrapreneuriale
 
 === Presentation de LeHibou et de son environnement technique
 
@@ -177,9 +23,11 @@ problemes isoles.
 
 === Enjeux de fiabilite, d'efficacite et de maitrise des couts
 
-=== Place de la fiabilite dans l'activite de l'entreprise
+=== Place de la fiabilite dans la creation de valeur
 
-== Diagnostic des limites actuelles du systeme
+=== Lecture intrapreneuriale de la mission : transformer un irritant recurrent en capacite collective
+
+== Diagnostic des fragilites actuelles et de leurs effets business
 
 === Fragilite des validations end-to-end
 
@@ -189,36 +37,40 @@ problemes isoles.
 
 === Limites de l'observabilite et du diagnostic
 
-=== Consequences operationnelles des limites identifiees
+=== Consequences operationnelles, economiques et organisationnelles des limites identifiees
 
-== Stabilisation des tests end-to-end
+== Premier levier : fiabiliser les validations pour fluidifier la livraison
 
-=== Fiabilisation de l'existant
+=== Reprise critique de l'existant et priorisation des points de rupture
 
-=== Correction des sources d'instabilite
+=== Construction d'un socle de test plus reproductible
 
-=== Recherche de scenarios reproductibles
+=== Role du seeding et de la normalisation des acces
 
-=== Integration des tests dans des environnements realistes
+=== Integration progressive dans des environnements Fabrica realistes
 
-=== Role du seeding dans la fiabilisation des tests
+=== Conditions de passage vers une automatisation credible sur `develop`
 
-=== Perspective d'automatisation dans le cycle de livraison
+=== Valeur attendue pour l'entreprise, limites actuelles et points encore ouverts
 
-== Renforcement progressif du monitoring
+== Second levier : renforcer la capacite de diagnostic sans surevaluer l'existant
 
-=== Centralisation et exploitation des logs
+=== Etat actuel des chantiers CloudWatch et Sentry
 
-=== Amelioration de la lisibilite des incidents
+=== Ameliorations visees dans la lisibilite des incidents
 
 === Articulation entre CloudWatch et Sentry
 
-=== Contribution attendue a la reduction des couts et a l'efficacite operationnelle
+=== Apports attendus en temps d'investigation, coordination et maitrise des couts
 
-=== Complementarite entre prevention et diagnostic
+=== Limites, dependances et mesures restant a mettre en oeuvre
+
+=== Complementarite entre prevention, diagnostic et capacite d'initiative
 
 == Conclusion
 
 === Bilan de la demarche
 
-=== Perspectives d'amelioration
+=== Ce que la mission apporte deja et ce qui reste a consolider
+
+=== Perspectives d'amelioration et potentiel de diffusion a l'echelle de l'entreprise
