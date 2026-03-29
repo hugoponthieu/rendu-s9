@@ -796,15 +796,149 @@ de confiance plus solide.
 
 === État actuel des chantiers CloudWatch et Sentry
 
+Le second levier ne part pas d'un vide instrumental. Le dépôt montre au
+contraire que Sentry est déjà branché à plusieurs niveaux du système. Côté
+front, les erreurs API sont capturées avec des informations de contexte comme
+l'identifiant de requête, l'URL appelée, le code de statut et, lorsqu'il est
+disponible, l'utilisateur concerné. Côté backend, une bibliothèque transverse
+alimente Sentry dans de nombreux microservices et y rattache d'emblée un tag
+de microservice. Les interceptors en place enrichissent aussi les événements
+selon le type de flux traité : requête HTTP, appel gRPC, message RabbitMQ ou
+événement WebSocket. Cette base n'est donc ni improvisée ni marginale ; elle
+témoigne d'une volonté réelle d'inscrire l'observabilité dans l'architecture
+courante.
+
+Pour autant, il serait trompeur d'en déduire que la capacité de diagnostic est
+déjà pleinement satisfaisante. Les chantiers ouverts autour de Sentry et de
+CloudWatch indiquent précisément l'inverse : l'outillage existe, mais son
+usage reste encore insuffisamment décisif pour identifier rapidement l'origine
+d'un incident en production. Le besoin formulé n'est pas seulement de capter
+des erreurs, mais de pouvoir relier un signal à un service, à un endpoint, à
+un contexte d'exécution et, si possible, à un parcours métier intelligible.
+De même, le sujet CloudWatch est posé en termes d'amélioration des logs, de
+couverture plus large des applications et de meilleure maîtrise du niveau de
+verbosité. L'état observé correspond donc à une observabilité présente, mais
+encore inégalement exploitable.
+
 === Améliorations visées dans la lisibilité des incidents
+
+L'amélioration recherchée porte avant tout sur la qualité interprétative du
+signal. Dans un système distribué, la première difficulté n'est pas toujours de
+savoir qu'une erreur a eu lieu, mais de comprendre où elle s'est produite et
+dans quelles conditions. Les mécanismes déjà en place montrent que cette
+orientation est amorcée : les requêtes HTTP peuvent être enrichies avec le
+chemin appelé, les messages RabbitMQ avec les headers et la clé de routage,
+les appels gRPC avec leurs métadonnées, et certaines erreurs front avec des
+éléments de contexte sur la réponse reçue. Ce que vise le chantier n'est donc
+pas une collecte plus massive, mais une collecte plus discriminante.
+
+Une telle évolution change la nature même de l'investigation. Si Sentry permet
+de distinguer rapidement si une anomalie provient, par exemple, d'un service
+d'authentification, d'un traitement asynchrone ou d'un flux de recherche, le
+travail d'analyse ne commence plus par une phase de localisation laborieuse.
+Il peut porter plus tôt sur la cause. De la même manière, des logs CloudWatch
+mieux structurés permettent de remonter plus vite d'un symptôme général à une
+séquence d'actions cohérente. L'enjeu est donc de transformer des traces
+techniques dispersées en indices convergents. Ce déplacement est important,
+car dans une architecture riche en dépendances, la perte de temps provient
+souvent moins du correctif lui-même que de l'effort nécessaire pour formuler un
+diagnostic initial crédible.
 
 === Articulation entre CloudWatch et Sentry
 
+L'intérêt du second levier réside aussi dans la complémentarité des deux
+outils. Sentry capte des exceptions, des traces et des métadonnées déjà
+structurées autour d'un événement précis. Il fournit un point d'entrée utile
+pour repérer un bug, suivre sa fréquence et identifier le composant apparent
+concerné. CloudWatch répond à un autre besoin. Il permet de replacer
+l'événement dans une continuité d'exécution plus large, à travers les logs
+émis par les applications et, à terme, à travers une couverture plus homogène
+des différents services. Autrement dit, Sentry aide à voir l'incident ; les
+logs aident à reconstruire la séquence qui l'entoure.
+
+Cette articulation est particulièrement pertinente dans l'écosystème LeHibou,
+où un même parcours peut traverser un front, un microservice exposé en HTTP,
+des communications interservices et des traitements asynchrones. Une alerte
+isolée, même correctement remontée, ne suffit pas toujours à distinguer une
+erreur de bord d'un défaut plus profond de propagation ou de données. À
+l'inverse, des logs abondants mais mal ciblés risquent de noyer l'information
+utile. L'objectif n'est donc pas de juxtaposer deux sources de signal, mais de
+les rendre mutuellement fécondes : Sentry pour pointer rapidement le lieu
+probable du problème, CloudWatch pour confirmer, contextualiser et suivre le
+chemin réel de l'exécution. C'est cette articulation qui rend le diagnostic
+plus robuste qu'une dépendance exclusive à l'un ou l'autre outil.
+
 === Apports attendus en temps d'investigation, coordination et maîtrise des coûts
+
+Les gains attendus ne doivent pas être lus comme un simple confort pour les
+développeurs. Ils touchent directement au coût opérationnel des incidents. Dès
+lors qu'un bug peut être rattaché plus vite à un service, à un endpoint ou à
+un flux de messages identifiable, le temps perdu en hypothèses concurrentes se
+réduit. Les équipes passent moins de temps à reproduire à l'aveugle, à
+solliciter plusieurs interlocuteurs pour localiser la panne ou à relancer des
+tests uniquement pour préciser le périmètre du problème. Dans une organisation
+où front, backoffice, backend et infrastructure interagissent étroitement, cet
+effet de réduction du temps mort a une portée concrète.
+
+La maîtrise des coûts apparaît alors sous plusieurs formes. Elle concerne
+d'abord le coût humain de l'investigation, c'est-à-dire le temps mobilisé pour
+produire un diagnostic exploitable. Elle concerne aussi le coût de
+coordination : moins un incident est ambigu, moins il appelle de transferts de
+charge ou d'échanges exploratoires entre équipes. Enfin, elle touche au coût
+de validation secondaire. Une meilleure lisibilité permet d'éviter des retests
+étendus ou des vérifications manuelles destinées surtout à compenser
+l'insuffisance du signal initial. Le second levier ne promet donc pas
+l'élimination des incidents ; il vise une baisse du coût unitaire de leur
+compréhension, ce qui constitue déjà un progrès stratégique dans un système
+distribué.
 
 === Limites, dépendances et mesures restant à mettre en oeuvre
 
+Il convient néanmoins de garder une lecture prudente du chantier. Les tickets
+ouverts montrent que plusieurs mesures importantes restent à concrétiser. Pour
+CloudWatch, la centralisation des logs de toutes les applications n'est pas
+présentée comme achevée. La question de la journalisation des adresses IP
+utilisateur, ainsi que celle du filtrage des logs de debug en production,
+indique que la gouvernance même du signal est encore en cours de définition.
+Ces sujets sont loin d'être accessoires : un diagnostic utile suppose à la
+fois assez d'information pour comprendre un incident, et assez de discipline
+pour ne pas noyer cette information dans un bruit excessif ou dans des données
+mal hiérarchisées.
+
+La même prudence vaut pour Sentry. Le fait que le backend dispose déjà d'une
+bibliothèque commune, de tags de microservice et d'interceptors multi-protocoles
+constitue un socle sérieux, mais pas nécessairement un résultat final. Le
+besoin explicite d'identifier plus sûrement le service ou l'endpoint
+responsable d'un bug montre qu'il existe encore un écart entre l'instrumentation
+présente et l'exploitabilité attendue. En outre, la qualité du diagnostic
+dépend de pratiques distribuées : qualité des messages émis, homogénéité des
+conventions, choix des contextes attachés aux erreurs, exclusion des routes
+bruitées comme les health checks, et coordination avec les équipes concernées.
+Le second levier doit donc être compris comme une montée en rigueur, non comme
+la simple activation d'outils déjà suffisants.
+
 === Complémentarité entre prévention, diagnostic et capacité d'initiative
+
+Ce second levier prend tout son sens lorsqu'il est rapproché du premier. Des
+tests end-to-end plus fiables réduisent la probabilité que certaines
+régressions parviennent tardivement en environnement intégré ou en production.
+Ils ne suppriment pourtant ni les incidents résiduels, ni les anomalies liées à
+des interactions plus difficiles à anticiper, ni les défaillances propres à un
+système distribué. C'est ici que le diagnostic renforcé intervient. Il ne se
+substitue pas à la prévention ; il en prolonge l'effet en traitant plus vite et
+plus justement ce qui échappe encore aux validations amont.
+
+La dimension intrapreneuriale du chantier se situe précisément dans cette
+combinaison. Renforcer l'observabilité ne revient pas seulement à installer des
+outils supplémentaires, mais à améliorer la capacité collective à décider sur
+des bases mieux étayées : faut-il corriger immédiatement, isoler un service,
+rejouer un scénario, ajuster les logs ou reprendre une convention de tracing ?
+Une organisation gagne en autonomie quand elle réduit sa dépendance aux
+investigations longues, implicites et fortement personifiées. À cet égard, le
+second levier complète le premier en transformant la fiabilité opérationnelle
+en ressource de pilotage. Mieux prévenir et mieux diagnostiquer relèvent d'une
+même logique : diminuer l'incertitude pour agir plus vite, avec moins de bruit
+et un coût de coordination plus soutenable.
 
 == Conclusion
 
