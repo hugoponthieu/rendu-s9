@@ -18,8 +18,8 @@ croissance d'un système numérique ne se mesure pas seulement à la richesse de
 ses fonctionnalités, mais aussi à la capacité de l'organisation à les faire
 évoluer sans dégrader la qualité du service rendu. Chez LeHibou, cette
 question se pose avec une acuité particulière, car la chaîne de valeur repose
-sur un ensemble technique distribué qui articule un front public, un backoffice
-interne, un backend en microservices et une couche d'infrastructure permettant
+sur un ensemble technique distribué qui articule un <<lexique-front-public,front public>>, une <<lexique-backoffice,interface d'administration>>
+interne, un <<lexique-backend,backend>> en <<lexique-microservice,microservices>> et une couche d'infrastructure permettant
 de déployer des environnements temporaires proches du réel. Dans un tel cadre,
 la fiabilité opérationnelle ne constitue pas un sujet annexe réservé à la seule
 exploitation. Elle devient une condition de la fluidité de livraison, de la
@@ -36,13 +36,13 @@ restent fragiles, elles produisent au contraire un signal ambivalent :
 elles ralentissent les merges, exigent des vérifications manuelles
 complémentaires et entretiennent une forme de doute sur la réalité des
 régressions détectées. L'enjeu n'est donc pas seulement de "faire passer des
-tests", mais de rendre crédible un dispositif de validation dans un système ou
+tests", mais de rendre crédible un dispositif de validation dans un système où
 les dépendances sont nombreuses.
 
 Les éléments observés dans l'écosystème LeHibou confirment d'ailleurs que cette
 question dépasse largement le seul périmètre d'un front-end. Le front public
 cumule des fonctions d'acquisition, de recherche, d'authentification et de
-parcours métier. Bubo joue un rôle central pour les opérations internes, avec
+parcours métier. <<lexique-bubo,Bubo>> joue un rôle central pour les opérations internes, avec
 des flux liés aux leads, aux candidats, aux contrats ou encore au suivi de
 mission. En arrière-plan, le backend rassemble un ensemble étendu de services
 spécialisés, reliés à plusieurs bases de données, à des mécanismes de
@@ -54,24 +54,24 @@ de manière artisanale.
 La mission s'inscrit ainsi dans une lecture intrapreneuriale de la fiabilité.
 Il ne s'agit pas seulement de corriger un irritant local, mais de transformer
 une difficulté récurrente en capacité collective. La mise en place progressive
-d'un seeding plus explicite, l'usage d'environnements Fabrica pour rapprocher
+d'un <<lexique-seeding,seeding>> plus explicite, l'usage d'environnements <<lexique-fabrica,Fabrica>> pour rapprocher
 la validation de conditions d'exécution réalistes, puis l'amélioration de la
-lisibilité des incidents à travers Sentry et CloudWatch relèvent d'une même
+lisibilité des incidents à travers <<lexique-sentry,Sentry>> et <<lexique-cloudwatch,CloudWatch>> relèvent d'une même
 logique. L'objectif est de mieux maîtriser le risque sans multiplier à
 l'infini les contrôles humains, les coordinations ad hoc et les reprises
 manuelles. Autrement dit, la mission relie directement des choix techniques à
 des enjeux d'efficacité opérationnelle, de qualité de service et de maîtrise
 des coûts.
 
-.Vue d'ensemble simplifiee de l'ecosysteme technique
-image::images/ecosysteme-general.svg[Vue d'ensemble de l'ecosysteme technique,align=center,pdfwidth=100%]
+.Vue d'ensemble simplifiée de l'écosystème technique
+image::images/ecosysteme-general.svg[Vue d'ensemble de l'écosystème technique,align=center,pdfwidth=100%]
 
 === Problématique
 
 Le cœur du problème peut se formuler de la manière suivante : comment
 fiabiliser un système plus riche, plus distribué et plus réaliste sans
 augmenter de façon disproportionnée le coût de sa vérification et de son
-diagnostic ? La question est structurante, car l'observation du dépôt montre
+diagnostic ? La question est structurante, car l'architecture observée montre
 que LeHibou ne repose ni sur une application monolithique simple à simuler, ni
 sur un environnement unique suffisant pour toutes les validations. Le backend
 orchestralise de nombreux services, les interfaces couvrent des publics et des
@@ -79,7 +79,7 @@ usages différents, et Fabrica cherche précisément à reconstruire des
 environnements éphémères complets avec des données proches de la production.
 Dans ce contexte, la fiabilité ne peut pas être obtenue par une simple
 addition d'outils ; elle  dépend de la qualité des articulations entre tests,
-données, environnements et observabilité.
+données, environnements et <<lexique-observabilite,observabilité>>.
 
 Du côté des tests end-to-end, plusieurs limites apparaissent. D'abord, certains
 scénarios restent sensibles à la machine d'exécution ou à l'état préalable des
@@ -101,7 +101,7 @@ des incidents. La présence de Sentry dans les applications et dans le backend,
 ainsi que les chantiers autour des logs CloudWatch, indiquent que les outils
 existent déjà. Pourtant, leur simple présence ne garantit pas une observabilité
 opérationnelle suffisante. Si l'information remontée ne permet pas d'identifier
-rapidement le service, l'endpoint, le contexte ou le parcours concerné, le
+rapidement le service, l'<<lexique-endpoint,endpoint>>, le contexte ou le parcours concerné, le
 temps d'investigation demeure élevé et la coordination entre acteurs reste
 coûteuse. L'enjeu réel n'est donc pas de "rajouter du monitoring", mais de
 rendre les signaux effectivement exploitables.
@@ -115,8 +115,8 @@ environnements, le temps disponible des équipes et la maîtrise des coûts
 techniques et organisationnels. C'est dans cette tension entre prévention,
 diagnostic et économie de coordination que se situe la contribution étudiée.
 
-.Tension centrale entre prevention, diagnostic et couts
-image::images/triangle-problematique.svg[Triangle prevention diagnostic couts,align=center,pdfwidth=80%]
+.Tension centrale entre prévention, diagnostic et coûts
+image::images/triangle-problematique.svg[Triangle prévention diagnostic coûts,align=center,pdfwidth=80%]
 
 === Démarche retenue
 
@@ -126,231 +126,236 @@ chaîne de validation end-to-end afin d'identifier les causes concrètes
 d'instabilité, puis à construire un socle plus reproductible. Cette orientation
 se justifie par un principe simple : un dispositif de diagnostic, même utile,
 ne compense pas durablement une prévention insuffisante. Tant que les tests
-restent trop  dépendants d'états implicites ou de préconditions difficiles a
+restent trop  dépendants d'états implicites ou de préconditions difficiles à
 reproduire, l'organisation continue de payer un coût élevé en vérifications
-manuelles, en retests et en hesitations au moment de livrer. Le travail sur le
+manuelles, en retests et en hésitations au moment de livrer. Le travail sur le
 seeding, la normalisation des accès et l'autonomie des scénarios constitue donc
 la première brique de la transformation.
 
-Ce premier temps n'est pas pense comme une abstraction methodologique, mais
+Ce premier temps n'est pas pensé comme une abstraction méthodologique, mais
 comme une évolution ancrée dans les contraintes du système. La mise en place
 d'un service de seeding transverse, capable d'interagir avec plusieurs bases et
-de fournir des données de reference, des utilisateurs ou des états métier plus
-cohérents, repond directement aux limites observées dans les fixtures statiques.
-De même, le recours progrèssif à Fabrica vise à rapprocher l'exécution des
+de fournir des données de référence, des utilisateurs ou des états métier plus
+cohérents, répond directement aux limites observées dans les fixtures statiques.
+De même, le recours progressif à Fabrica vise à rapprocher l'exécution des
 tests de conditions plus réalistes, avec des environnements complets et des
-données plus proches des usages effectifs. Cette trajectoire reste toutefois a
-presenter avec prudence : plusieurs sujets demeurent ouverts, notamment sur la
-qualité des jeux de données, la reindexation, la vitesse de deploiement ou la
-generalisation de l'automatisation après merge sur `develop`.
+données plus proches des usages effectifs. Cette trajectoire reste toutefois à
+présenter avec prudence : plusieurs sujets demeurent ouverts, notamment sur la
+qualité des jeux de données, la réindexation, la vitesse de déploiement ou la
+généralisation de l'automatisation après merge sur `develop`.
 
 Le second temps prolonge logiquement le premier sans le dupliquer. Une fois
-posee la question de la prévention, il devient possible d'examiner celle du
-diagnostic. Le rapport etudie donc ensuite les chantiers lies à Sentry et a
-CloudWatch, non pour supposer une observabilité déjà mature, mais pour evaluer
-ce qui doit encore être clarifie afin de mieux localiser les incidents, de
-reduire le temps d'investigation et de limiter les coordinations inutiles entre
-équipes. Cette seconde partie n'est pas separee artificiellement de la
-première : elle en constitue le complement necessaire. Les tests reduisent la
-probabilite de certaines régressions ; l'observabilité ameliore la comprehension
+posée la question de la prévention, il devient possible d'examiner celle du
+diagnostic. Le rapport étudie donc ensuite les chantiers liés à Sentry et à
+CloudWatch, non pour supposer une observabilité déjà mature, mais pour évaluer
+ce qui doit encore être clarifié afin de mieux localiser les incidents, de
+réduire le temps d'investigation et de limiter les coordinations inutiles entre
+équipes. Cette seconde partie n'est pas séparée artificiellement de la
+première : elle en constitue le complément nécessaire. Les tests réduisent la
+probabilité de certaines régressions ; l'observabilité améliore la compréhension
 de celles qui subsistent.
 
-Le fil directeur de l'ensemble peut ainsi se resumer en trois verbes :
+Le fil directeur de l'ensemble peut ainsi se résumer en trois verbes :
 fiabiliser, observer, arbitrer. Fiabiliser, pour produire un signal de
 validation plus crédible avant livraison. Observer, pour rendre les incidents
 restants plus rapidement intelligibles. Arbitrer, enfin, parce que chaque
-amélioration doit être appreciee au regard de son coût de mise en oeuvre, de
+amélioration doit être appréciée au regard de son coût de mise en oeuvre, de
 sa diffusion possible à l'échelle de l'entreprise et de son impact sur
 l'efficacité collective. Le rapport n'analyse donc pas un dispositif déjà
-entierement industrialise. Il etudie une trajectoire en cours, ses acquis, ses
-limites et la manière dont une initiative technique ciblee peut devenir un
+entièrement industrialisé. Il étudie une trajectoire en cours, ses acquis, ses
+limites et la manière dont une initiative technique ciblée peut devenir un
 levier intrapreneurial plus large.
+
+<<<
 
 == Contexte de l'entreprise et opportunité intrapreneuriale
 
 === Présentation de LeHibou et de son environnement technique
 
-LeHibou peut être compris comme une plateforme d'intermediation specialisee
+LeHibou peut être compris comme une plateforme d'intermédiation spécialisée
 dans les profils IT, mais cette qualification demeure insuffisante si on la
-reduisait à un simple annuaire de fréelances. Les surfaces observées montrent
-au contraire une organisation ou l'activite commerciale repose sur
+réduisait à un simple annuaire de freelances. Les surfaces observées montrent
+au contraire une organisation où l'activité commerciale repose sur
 l'articulation de plusieurs fonctions : acquisition de la demande,
-structuration de l'offre, qualification des profils, suivi des opportunites,
+structuration de l'offre, qualification des profils, suivi des opportunités,
 formalisation contractuelle et accompagnement de l'exécution des missions.
 L'entreprise ne vend donc pas uniquement de la mise en relation ; elle vend une
-capacité à rendre exploitable, pour des clients souvent exigeants, un marche du
-travail in dépendant par nature fragmentaire. Cette promesse explique pourquoi
+capacité à rendre exploitable, pour des clients souvent exigeants, un marché du
+travail indépendant par nature fragmentaire. Cette promesse explique pourquoi
 la dimension logicielle occupe une place centrale dans le fonctionnement
 quotidien de l'organisation.
 
-Le front public porte une première partie de cette promesse. Il sert bien sur a
-presenter l'offre, à exposer des parcours de recherche et à faciliter
+Le front public porte une première partie de cette promesse. Il sert bien sûr à
+présenter l'offre, à exposer des parcours de recherche et à faciliter
 l'inscription, mais il dépasse la logique d'un simple site vitrine. Les routes
-consacrees à la recherche, aux annonces, aux profils fréelances, aux comptes
-utilisateurs ou à une offre de type FMS indiquent que la plateforme soutient a
-la fois des usages d'acquisition et des usages applicatifs. Cette dualite est
-importante. D'un cote, l'entreprise doit convaincre et convertir. De l'autre,
+consacrées à la recherche, aux annonces, aux profils freelances, aux comptes
+utilisateurs ou à une offre de type FMS (_Freelance Manager System_) indiquent que la plateforme soutient à
+la fois des usages d'acquisition et des usages applicatifs. Cette dualité est
+importante. D'un côté, l'entreprise doit convaincre et convertir. De l'autre,
 elle doit déjà faire entrer l'utilisateur dans une chaîne de traitement plus
-riche, dans laquelle les données saisies ou consultees doivent rester
-coherentes avec le reste du système. Le front public se situe donc à la
-frontiere entre exposition commerciale et exécution opérationnelle.
+riche, dans laquelle les données saisies ou consultées doivent rester
+cohérentes avec le reste du système. Le front public se situe donc à la
+frontière entre exposition commerciale et exécution opérationnelle.
 
-Cette exécution se prolonge ensuite dans un backoffice dedie aux équipes
-internes et dans un backend qui rassemble un nombre élevé de services métier.
+Cette exécution se prolonge ensuite dans une interface d'administration dédiée
+aux équipes internes et dans un backend qui rassemble un nombre élevé de
+services métier.
 Les domaines visibles couvrent les leads, les candidats, les contrats, les
 devis, les bons de commande, les missions, les recommandations, les
 notifications ou encore la recherche. Le backend lui-même articule plusieurs
 microservices, plusieurs types de stockage et des intégrations externes. Cette
-profondeur fonctionnelle suggere une entreprise déjà engagee dans une
-industrialisation avancee de ses opérations. Elle permet de traiter des flux
-nombreux et heterogenes, mais elle fait aussi apparaitre une contrainte
+profondeur fonctionnelle suggère une entreprise déjà engagée dans une
+industrialisation avancée de ses opérations. Elle permet de traiter des flux
+nombreux et hétérogènes, mais elle fait aussi apparaître une contrainte
 structurante : plus la valeur repose sur la coordination entre composants, plus
-la fiabilité des interfaces entre ces composants devient decisive.
+la fiabilité des interfaces entre ces composants devient décisive.
 
 === Organisation de l'écosystème technique
 
-L'ecosystème technique de LeHibou se laisse lire selon une logique de couches
+L'écosystème technique de LeHibou se laisse lire selon une logique de couches
 complémentaires. La première couche regroupe les surfaces visibles par les
-utilisateurs externes : pages de presentation, moteur de recherche, parcours
-d'inscription, espaces de compte et fonctions liees au recrutement ou à la
+utilisateurs externes : pages de présentation, moteur de recherche, parcours
+d'inscription, espaces de compte et fonctions liées au recrutement ou à la
 mise en relation. La seconde couche correspond aux outils internes de
-production du service. Le backoffice concentre des flux de qualification, de
+production du service. L'interface d'administration concentre des flux de qualification, de
 suivi commercial, de contractualisation et de pilotage de mission qui ne sont
-pas exposes au public mais qui conditionnent concretement la capacité a
-transformer une demande en mission executee. Enfin, une troisième couche
-orientee plateforme reunit le backend distribué et les mécanismes
+pas exposés au public mais qui conditionnent concrètement la capacité à
+transformer une demande en mission exécutée. Enfin, une troisième couche
+orientée plateforme réunit le backend distribué et les mécanismes
 d'infrastructure nécessaires à son fonctionnement.
 
 Cette organisation montre que la valeur produite ne provient pas d'un composant
-isole, mais d'une chaîne continue ou chaque brique transmet un contexte à la
-suivante. Une recherche effectuee sur la plateforme publique n'a d'interet que
-si les données sous-jacentes sont correctement indexees. Une opportunite
+isolé, mais d'une chaîne continue où chaque brique transmet un contexte à la
+suivante. Une recherche effectuée sur la plateforme publique n'a d'intérêt que
+si les données sous-jacentes sont correctement indexées. Une opportunité
 commerciale n'est réellement exploitable que si les informations circulent
 ensuite vers les outils internes de qualification, puis vers les services de
 contrat, de notification ou de mission. Inversement, une anomalie dans un
-service secondaire peut produire des effets visibles bien au-dela de son
+service secondaire peut produire des effets visibles bien au-delà de son
 périmètre apparent, parce qu'elle perturbe un enchaînement plus large. Le
-decoupage en domaines permet de specialiser les responsabilites, mais il rend
-egalement la validation de bout en bout plus exigeante.
+découpage en domaines permet de spécialiser les responsabilités, mais il rend
+également la validation de bout en bout plus exigeante.
 
-La présence de Fabrica eclaire cette exigence. Le simple fait qu'un outillage
-specifique soit consacre à la création d'environnements AWS temporaires,
-complets et alimentes par des données proches du réel indique que les
-environnements generiques ne suffisent plus pour verifier serieusement les
-évolutions. Autrement dit, l'entreprise ne se contente plus d'un schema ou un
-developpeur valide localement une fonctionnalite avant de la livrer. Elle doit
+La présence de Fabrica éclaire cette exigence. Le simple fait qu'un outillage
+spécifique soit consacré à la création d'environnements <<lexique-aws,AWS>> temporaires,
+complets et alimentés par des données proches du réel indique que les
+environnements génériques ne suffisent plus pour vérifier sérieusement les
+évolutions. Autrement dit, l'entreprise ne se contente plus d'un schéma où un
+développeur valide localement une fonctionnalité avant de la livrer. Elle doit
 pouvoir reconstituer, à coût maîtrise, des conditions d'exécution assez riches
 pour observer les interactions réelles entre interfaces, microservices,
-indexation, données restaurees et automatisations de deploiement. Cette
-capabilite est precieuse, mais elle rend egalement plus visible la complexite
-opérationnelle du système et la necessite de mécanismes de validation plus
+indexation, données restaurées et automatisations de déploiement. Cette
+capabilité est précieuse, mais elle rend également plus visible la complexité
+opérationnelle du système et la nécessité de mécanismes de validation plus
 reproductibles.
 
 === Enjeux de fiabilité, d'efficacité et de maîtrise des coûts
 
 Dans un tel contexte, la fiabilité n'est pas seulement un objectif de qualité
-logicielle au sens etroit. Elle conditionne directement l'efficacité du travail
+logicielle au sens étroit. Elle conditionne directement l'efficacité du travail
 collectif. Lorsque les tests end-to-end restent instables, le coût ne se limite
-pas au temps machine ou au desagrement d'une exécution en echec. Chaque doute
-sur la validite d'un résultat oblige à rouvrir une phase d'interprétation :
+pas au temps machine ou au désagrément d'une exécution en échec. Chaque doute
+sur la validité d'un résultat oblige à rouvrir une phase d'interprétation :
 faut-il corriger le produit, ajuster le test, reconstruire l'environnement ou
 simplement relancer ? Cette incertitude produit des frictions de coordination,
-mobilise plusieurs acteurs et ralentit les decisions de merge ou de deploiement.
+mobilise plusieurs acteurs et ralentit les décisions de merge ou de déploiement.
 Dans une architecture distribuée, ces frictions se multiplient rapidement car
-les causes possibles sont plus nombreuses que dans un système plus centralise.
+les causes possibles sont plus nombreuses que dans un système plus centralisé.
 
-L'observabilité repond à un enjeu symetrique. Meme avec de meilleures
-validations, certains incidents continueront d'apparaitre en exécution réelle.
-La question devient alors celle du temps necessaire pour transformer un signal
+L'observabilité répond à un enjeu symétrique. Même avec de meilleures
+validations, certains incidents continueront d'apparaître en exécution réelle.
+La question devient alors celle du temps nécessaire pour transformer un signal
 brut en diagnostic utile. La présence de Sentry dans plusieurs applications et
 dans le backend, ainsi que les chantiers reliés aux logs CloudWatch, montrent
-que l'entreprise à déjà identifie ce besoin. Toutefois, un outillage present
+que l'entreprise a déjà identifié ce besoin. Toutefois, un outillage présent
 n'est pas automatiquement un outillage exploitable. Si l'erreur remontée ne
-permet pas de localiser rapidement le service concerne, l'endpoint touche ou le
-parcours utilisateur associe, l'investigation reste coûteuse. Le coût d'un
-incident se mesure alors aussi au nombre d'echanges nécessaires pour le rendre
+permet pas de localiser rapidement le service concerné, l'endpoint touché ou le
+parcours utilisateur associé, l'investigation reste coûteuse. Le coût d'un
+incident se mesure alors aussi au nombre d'échanges nécessaires pour le rendre
 intelligible.
 
 La maîtrise des coûts doit donc être entendue ici dans un sens large. Elle
-englobe bien sur les coûts d'infrastructure, ce qui explique l'accent mis par
+englobe bien sûr les coûts d'infrastructure, ce qui explique l'accent mis par
 Fabrica sur les environnements temporaires et le nettoyage automatique. Mais
-elle concerne egalement les coûts humains et organisationnels : temps de
-retest, delai de comprehension, multiplication des vérifications manuelles,
-interruptions de contexte et hesitations dans la chaîne de livraison. La
-fiabilité devient ainsi une variable economique autant que technique. Un
+elle concerne également les coûts humains et organisationnels : temps de
+retest, délai de compréhension, multiplication des vérifications manuelles,
+interruptions de contexte et hésitations dans la chaîne de livraison. La
+fiabilité devient ainsi une variable économique autant que technique. Un
 système plus lisible et plus reproductible ne réduit pas seulement le risque de
-defaut ; il réduit aussi le coût de chaque arbitrage quotidien entre livrer,
+défaut ; il réduit aussi le coût de chaque arbitrage quotidien entre livrer,
 attendre, investiguer ou reprendre.
 
 === Place de la fiabilité dans la création de valeur
 
 La création de valeur chez LeHibou  dépend fortement de la confiance qui peut
-être accordee aux flux numériques supportant l'intermediation. La plateforme
-publique doit inspirer une impression de serieux et de fluidité, mais cette
-impression n'a de substance que si les parcours clefs fonctionnent de manière
-coherente. Pour un client, une recherche pertinente, une prise de contact bien
+être accordée aux flux numériques supportant l'intermédiation. La plateforme
+publique doit inspirer une impression de sérieux et de fluidité, mais cette
+impression n'a de substance que si les parcours clés fonctionnent de manière
+cohérente. Pour un client, une recherche pertinente, une prise de contact bien
 transmise ou un suivi fiable des interactions participent directement à la
-qualité percue du service. Pour un fréelance, la lisibilité des parcours
+qualité perçue du service. Pour un freelance, la lisibilité des parcours
 d'inscription, de profil et d'interaction conditionne la capacité à rejoindre
-effectivement la place de marche. La fiabilité n'est donc pas un element
-invisible detache du business ; elle influence la qualité du service rendu sur
+effectivement la place de marché. La fiabilité n'est donc pas un élément
+invisible détaché du business ; elle influence la qualité du service rendu sur
 les deux faces de la plateforme.
 
-Cette relation se renforce encore dans les usages internes. Le backoffice joue
-un rôle d'outil de production pour les équipes qui transforment une opportunite
-commerciale en activite facturee. Si les flux reliés aux leads, aux contrats,
+Cette relation se renforce encore dans les usages internes. L'interface
+d'administration joue un rôle d'outil de production pour les équipes qui transforment une opportunité
+commerciale en activité facturée. Si les flux reliés aux leads, aux contrats,
 aux devis, aux bons de commande ou aux missions sont fragiles, la perte ne se
-situe pas seulement dans l'experience logicielle des employes. Elle affecte la
-cadence avec laquelle l'entreprise peut qualifier, securiser et suivre ses
-engagements. A l'inverse, une meilleure fiabilité augmente la capacité à agir
+situe pas seulement dans l'expérience logicielle des employés. Elle affecte la
+cadence avec laquelle l'entreprise peut qualifier, sécuriser et suivre ses
+engagements. À l'inverse, une meilleure fiabilité augmente la capacité à agir
 vite sans multiplier les contrôles compensatoires. Elle soutient une exécution
-plus reguliere des opérations, ce qui constitue une forme concrete de création
+plus régulière des opérations, ce qui constitue une forme concrète de création
 de valeur interne.
 
 Il faut enfin souligner qu'une entreprise de cette nature tire une partie de sa
-credibilite de sa capacité à absorber la complexite pour le compte de ses
-clients et de ses fréelances. Or cette absorption ne peut pas reposer
-durablement sur l'effort heroique des équipes. Elle exige des outils stables,
+crédibilité de sa capacité à absorber la complexité pour le compte de ses
+clients et de ses freelances. Or cette absorption ne peut pas reposer
+durablement sur l'effort héroïque des équipes. Elle exige des outils stables,
 des validations crédibles et des signaux d'incident suffisamment explicites
-pour permettre des reactions rapides. Lire la fiabilité comme levier de valeur
-revient donc à reconnaitre qu'elle soutient simultanement la qualité percue,
+pour permettre des réactions rapides. Lire la fiabilité comme levier de valeur
+revient donc à reconnaître qu'elle soutient simultanément la qualité perçue,
 l'efficacité interne et la capacité de l'entreprise à tenir une promesse de
-service plus exigeante qu'une simple mise en relation automatisee.
+service plus exigeante qu'une simple mise en relation automatisée.
 
 === Lecture intrapreneuriale de la mission : transformer un irritant récurrent en capacité collective
 
-La dimension intrapreneuriale de la mission apparait précisément à cet endroit.
-Le point de depart est modeste en apparence : des tests end-to-end encore trop
+La dimension intrapreneuriale de la mission apparaît précisément à cet endroit.
+Le point de départ est modeste en apparence : des tests end-to-end encore trop
 fragiles pour jouer pleinement leur rôle dans la chaîne de livraison. Pris
-seul, un tel sujet pourrait être traite comme une suite de corrections
+seul, un tel sujet pourrait être traité comme une suite de corrections
 ponctuelles. Pourtant, les éléments observés invitent à une lecture plus large.
-Stabiliser des scénarios, clarifier les préconditions, mieux gerer le seeding
+Stabiliser des scénarios, clarifier les préconditions, mieux gérer le seeding
 ou rapprocher les exécutions de Fabrica ne revient pas seulement à corriger des
-scripts ; cela revient à formaliser une manière plus robuste de verifier le
-système. L'initiative cree ainsi des standards reutilisables, qui dépassent le
-besoin immediat ayant motive l'intervention.
+scripts ; cela revient à formaliser une manière plus robuste de vérifier le
+système. L'initiative crée ainsi des standards réutilisables, qui dépassent le
+besoin immédiat ayant motivé l'intervention.
 
-Cette logique correspond à une posture intrapreneuriale parce qu'elle cherche a
+Cette logique correspond à une posture intrapreneuriale parce qu'elle cherche à
 transformer une douleur récurrente en capacité organisationnelle. Un test plus
 autonome, un environnement de validation plus réaliste ou un signal d'erreur
-mieux contextualise profitent à plusieurs équipes à la fois. Ils reduisent la
+mieux contextualisé profitent à plusieurs équipes à la fois. Ils réduisent la
  dépendance à des savoirs tacites, à des manipulations manuelles ou à des
 personnes capables, seules, de reconstruire le contexte d'un dysfonctionnement.
-Autrement dit, la valeur de la mission ne reside pas uniquement dans le fait de
-faire disparaitre quelques echecs de pipeline. Elle reside dans l'augmentation
+Autrement dit, la valeur de la mission ne réside pas uniquement dans le fait de
+faire disparaître quelques échecs de pipeline. Elle réside dans l'augmentation
 de l'autonomie collective face à un système devenu trop complexe pour rester
-gouverne de manière artisanale.
+gouverné de manière artisanale.
 
-L'opportunite intrapreneuriale se situe egalement dans la façon d'articuler
-court terme et transformation plus durable. A court terme, les gains attendus
-portent sur la credibilite des validations, la réduction des retests et une
+L'opportunité intrapreneuriale se situe également dans la façon d'articuler
+court terme et transformation plus durable. À court terme, les gains attendus
+portent sur la crédibilité des validations, la réduction des retests et une
 meilleure lisibilité des incidents. A plus long terme, le travail ouvre la
-possibilite d'une automatisation plus sure sur `develop`, d'un usage plus
-systematique des environnements éphémères et d'une diffusion de pratiques plus
-homogenes entre surfaces publiques, outils internes et services backend. Dans
+possibilité d'une automatisation plus sûre sur `develop`, d'un usage plus
+systématique des environnements éphémères et d'une diffusion de pratiques plus
+homogènes entre surfaces publiques, outils internes et services backend. Dans
 ce cadre, l'intrapreneuriat ne renvoie pas à la création d'un produit annexe,
-mais à la capacité de faire emerger, depuis un problème technique concret, un
+mais à la capacité de faire émerger, depuis un problème technique concret, un
 socle de fonctionnement plus scalable pour l'ensemble de l'entreprise.
+
+<<<
 
 == Diagnostic des fragilités actuelles et de leurs effets business
 
@@ -359,8 +364,7 @@ socle de fonctionnement plus scalable pour l'ensemble de l'entreprise.
 La fragilité actuelle des validations end-to-end tient d'abord au fait que ces
 tests portent sur des parcours réellement transverses dans un système dense,
 alors même que leurs préconditions ne sont pas encore suffisamment maîtrisées.
-Les chantiers ouverts autour des suites LeHibou et Bubo montrent que plusieurs
-scénarios demeurent sensibles à la machine d'exécution, à l'ordre de passage ou
+Plusieurs scénarios demeurent sensibles à la machine d'exécution, à l'ordre de passage ou
 à l'état préalable du système. Cette situation affaiblit la fonction même du
 test E2E. Au lieu de produire un signal net sur la présence ou non d'une
 régression, il introduit une zone grise dans laquelle l'échec peut provenir du
@@ -369,8 +373,7 @@ préparation de l'environnement. Dans une chaîne de livraison active, une telle
 ambiguïté coûte plus cher qu'une absence partielle de couverture, car elle
 consomme du temps d'interprétation à chaque exécution douteuse.
 
-L'analyse des travaux prévus confirme que cette instabilité ne relève pas
-seulement de quelques cas isolés. Plusieurs suites doivent encore être
+Cette instabilité ne relève pas seulement de quelques cas isolés. Plusieurs suites doivent encore être
 reprises pour supprimer des scénarios de transition, des doubles logins, des
 préconditions implicites ou des enchaînements entre scénarios. Des parcours
 mission simples doivent être isolés d'autres scénarios dont ils dépendaient
@@ -397,7 +400,7 @@ test ; elle devient une dette de coordination.
 Les limites de l'automatisation découlent logiquement de cette instabilité.
 L'objectif visé est clair : déclencher automatiquement les tests E2E après les
 merges sur `develop` afin de renforcer le flux de déploiement. Toutefois, les
-travaux encore ouverts montrent que cette automatisation ne peut pas être
+conditions actuelles montrent que cette automatisation ne peut pas être
 considérée comme un acquis. Elle suppose d'abord que le signal de validation
 soit suffisamment crédible pour être utilisé comme mécanisme d'arbitrage. Tant
 que des tests ne fonctionnent pas de manière homogène selon les contextes
@@ -416,20 +419,20 @@ automatisée puisse être lue comme une information robuste, suffisamment stable
 pour conditionner un merge ou éclairer une décision de livraison.
 
 Il faut également noter que l'automatisation cible n'est pas pensée pour un
-environnement abstrait. Les tickets ouverts relient explicitement ce sujet à
-l'exécution sur Fabrica, c'est-à-dire sur des environnements temporaires plus
+environnement abstrait. Elle est directement liée à l'exécution sur Fabrica,
+c'est-à-dire sur des environnements temporaires plus
 proches du réel. Cette ambition est cohérente avec l'architecture observée,
 mais elle renforce les exigences préalables. Plus l'environnement est réaliste,
 plus les dépendances entre services, données et indexation deviennent visibles.
 Automatiser trop tôt reviendrait donc à industrialiser une instabilité encore
-mal contenue. Le frein actuel n'est pas un manque d'outillage de CI ; c'est
+mal contenue. Le frein actuel n'est pas un manque d'outillage de <<lexique-ci,CI>> ; c'est
 l'absence, à ce stade, d'un socle de tests et de données assez robuste pour
 supporter une industrialisation sans générer davantage de bruit opérationnel.
 
 === Dépendance aux données et aux environnements
 
 La dépendance aux données apparaît comme l'une des causes les plus structurantes
-des fragilités constatées. Les différentes feuilles de route convergent sur un
+des fragilités constatées. Plusieurs indices convergent sur un
 point : une part trop importante des suites repose encore sur des comptes
 statiques, des fixtures difficiles à maintenir, des inscriptions effectuées
 uniquement pour préparer un scénario ou des états métier supposés déjà présents
@@ -440,7 +443,7 @@ mobilise plusieurs entités, plusieurs services et parfois plusieurs temporalit�
 métier. Dès lors, une donnée de test approximative ou incomplète suffit à
 affaiblir tout le scénario.
 
-Les travaux engagés sur un service de seeding global montrent bien cette
+La nécessité d'un service de seeding global montre bien cette
 profondeur du problème. Le besoin n'est pas seulement de créer quelques
 utilisateurs à la volée, mais de disposer d'une API capable de produire des
 états métier configurables à travers plusieurs bases, pour le développement
@@ -449,15 +452,15 @@ pour les utilisateurs, les missions, les favoris, les alertes ou encore les
 données de référence traduisent une exigence de normalisation plus large :
 sortir d'une logique où les suites embarquent leur propre bricolage de setup et
 revenir à un contrat commun de préparation des données. Le fait que les tests
-aient jusqu'ici recopié des entités du backend dans leur propre dépôt indique
+aient jusqu'ici recopié des entités du backend dans leur propre code indique
 d'ailleurs que la séparation entre logique de test et logique de création des
 données n'était pas encore suffisamment stabilisée.
 
 À cette dépendance s'ajoute la question de l'indexation. Le backend comporte un
 service de recherche dédié, des commandes de réindexation multiples et des
 parcours métier qui dépendent directement de la trouvabilité des missions, des
-freelances ou des leads. Or les travaux prévus autour d'une API d'indexation
-montrent qu'après seeding, les index ne sont pas nécessairement à jour et que
+freelances ou des leads. Or la nécessité d'une API d'indexation montre
+qu'après seeding, les index ne sont pas nécessairement à jour et que
 la réindexation demeure, pour certains cas, une opération manuelle exécutée à
 l'intérieur du conteneur de recherche. Cette contrainte casse l'automatisation
 et explique pourquoi un scénario apparemment correct peut néanmoins échouer ou
@@ -478,7 +481,7 @@ business est ambivalent : l'entreprise dispose d'un levier puissant pour
 rapprocher la validation du réel, mais ne capte pas encore tout son bénéfice
 faute d'un outillage de préparation suffisamment homogène.
 
-.Dependance entre seeding, indexation et fiabilite des scenarios E2E
+.Dépendance entre seeding, indexation et fiabilité des scénarios E2E
 image::images/seeding-indexation-e2e.svg[Seeding indexation et tests E2E,align=center,pdfwidth=100%]
 
 === Limites de l'observabilité et du diagnostic
@@ -486,7 +489,7 @@ image::images/seeding-indexation-e2e.svg[Seeding indexation et tests E2E,align=c
 Le second foyer de fragilité concerne l'observabilité. Les outils existent déjà
 dans plusieurs couches du système : Sentry est intégré aux frontends et au
 backend, tandis que CloudWatch est identifié comme support de centralisation des
-logs applicatifs. Pourtant, les travaux encore ouverts montrent que cette
+logs applicatifs. Pourtant, les limites actuelles montrent que cette
 présence ne suffit pas à garantir un diagnostic efficace. Le besoin exprimé
 pour Sentry est explicite : être capable d'identifier le service ou l'endpoint
 responsable d'un bug en production. Une telle formulation indique que
@@ -497,7 +500,8 @@ microservices.
 
 Cette limite doit être lue à l'échelle de l'architecture. Dans le backend,
 quatorze domaines applicatifs coexistent avec plusieurs mécanismes de stockage,
-de messagerie et de recherche. Une erreur visible côté front ou côté backoffice
+de messagerie et de recherche. Une erreur visible côté front ou côté interface
+d'administration
 peut donc provenir d'un service métier, d'une intégration, d'un défaut de
 sérialisation, d'une rupture de communication ou d'un problème d'indexation.
 Dans un tel contexte, un signal d'erreur dépourvu de contexte précis ne réduit
@@ -544,7 +548,7 @@ part croissante entre prévention imparfaite, interprétation des résultats et
 investigation corrective.
 
 L'effet économique doit également être souligné, même en l'absence de chiffrage
-fin dans le dépôt. Un test fiable ou un diagnostic rapide ne produisent pas
+fin à ce stade. Un test fiable ou un diagnostic rapide ne produisent pas
 seulement un gain technique ; ils évitent la mobilisation simultanée de plusieurs
 profils sur une même incertitude. À l'inverse, chaque incident mal localisé ou
 chaque validation contestable augmente le coût unitaire d'une livraison ou
@@ -556,14 +560,15 @@ diagnostic des fragilités actuelles ne renvoie donc pas à un simple confort de
 développement. Il met au jour des obstacles concrets à la scalabilité du mode
 de fonctionnement collectif.
 
+<<<
+
 == Premier levier : fiabiliser les validations pour fluidifier la livraison
 
 === Reprise critique de l'existant et priorisation des points de rupture
 
 Le premier levier de transformation consiste à reprendre les validations
 end-to-end à partir de leurs points de rupture les plus manifestes, et non à
-ajouter immédiatement de nouveaux scénarios. Le dépôt met en évidence une
-situation où la difficulté ne provient pas d'un déficit d'intention de test,
+ajouter immédiatement de nouveaux scénarios. La difficulté ne provient pas d'un déficit d'intention de test,
 mais d'un défaut de fiabilité du signal produit. Certains parcours échouent
 encore selon la machine d'exécution, d'autres dépendent d'un ordre implicite
 entre scénarios, et plusieurs suites mobilisent des comptes ou des états
@@ -573,9 +578,9 @@ elle peut au contraire multiplier les faux négatifs et brouiller la lecture
 des régressions réelles.
 
 La priorité logique consiste donc à distinguer ce qui relève d'un comportement
-métier à contrôler de ce qui n'est qu'un artefact de préparation. Les travaux
-engagés autour des flux mission, des suites LeHibou hors mission et des jeux de
-données Bubo convergent sur ce point. Ils ne visent pas seulement à "faire
+métier à contrôler de ce qui n'est qu'un artefact de préparation. La reprise
+des flux mission, des suites LeHibou hors mission et des jeux de données Bubo
+converge sur ce point. Elle ne vise pas seulement à "faire
 passer" des scénarios existants, mais à supprimer les dépendances entre tests,
 les doubles connexions, les enchaînements de transitions de compte et les
 préconditions construites par l'interface alors qu'elles devraient être
@@ -606,7 +611,7 @@ implicites entretiennent un doute structurel.
 
 === Construction d'un socle de test plus reproductible
 
-La réponse apportée dans le dépôt ne passe pas par une sophistication accrue
+La réponse pertinente ne passe pas par une sophistication accrue
 des scripts, mais par la construction d'un socle plus reproductible. Cette
 orientation apparaît dans la volonté d'isoler les scénarios, de conserver en
 interface seulement le comportement effectivement observé, et de déplacer hors
@@ -628,8 +633,8 @@ parallèle, ni la répétition, ni l'usage dans des environnements éphémères.
 Le même raisonnement s'étend aux flux qui ne relèvent pas principalement du
 domaine mission. Les parcours d'alertes, de favoris, de références ou de
 gestion de compte ne peuvent pas être durablement fiabilisés si des inscriptions
-ou des logins ne servent qu'à préparer une condition d'essai. Le dépôt montre
-au contraire une recherche de séparation entre les véritables tests de signup,
+ou des logins ne servent qu'à préparer une condition d'essai. Il faut au
+contraire rechercher une séparation entre les véritables tests de signup,
 qui doivent rester pilotés par l'interface, et les créations d'utilisateurs qui
 ne sont qu'un moyen de disposer d'un acteur authentifié dans un état précis.
 Cette distinction évite de confondre la validation d'une fonctionnalité avec la
@@ -643,15 +648,15 @@ des domaines métier nombreux, ce recentrage est essentiel. Sans lui, la
 validation de bout en bout resterait exposée à l'hétérogénéité du système au
 lieu de la maîtriser.
 
-.Passage d'un corpus fragile a un socle E2E plus reproductible
-image::images/avant-apres-socle-e2e.svg[Avant apres du socle E2E,align=center,pdfwidth=100%]
+.Passage d'un corpus fragile à un socle E2E plus reproductible
+image::images/avant-apres-socle-e2e.svg[Avant après du socle E2E,align=center,pdfwidth=100%]
 
 === Rôle du seeding et de la normalisation des accès
 
 Le seeding occupe ici une fonction structurante. Il ne s'agit pas seulement
 d'automatiser la création de quelques données, mais d'instaurer une manière
-cohérente de produire les états nécessaires à la validation. Les travaux
-documentés distinguent explicitement les rôles minimaux à couvrir, les contrats
+cohérente de produire les états nécessaires à la validation. Cette logique
+conduit à distinguer explicitement les rôles minimaux à couvrir, les contrats
 de données utiles et les tâches d'intégration permettant aux suites de
 consommer ces jeux de données de manière homogène. Cette orientation répond à
 une limite bien identifiée : l'usage de comptes statiques, de credentials
@@ -677,9 +682,9 @@ ajouté au scénario. Le résultat attendu n'est pas seulement une baisse de
 l'instabilité ; c'est aussi une meilleure diffusion des pratiques entre suites
 LeHibou et suites Bubo.
 
-Le seeding fait toutefois apparaître une limite importante, que le dépôt traite
+Le seeding fait toutefois apparaître une limite importante, qu'il faut traiter
 avec justesse. Tout ne peut pas être seedé de la même manière. Certains flux,
-notamment ceux qui touchent aux emails, à FMS ou à certains agrégats de page,
+notamment ceux qui touchent aux emails, à FMS (_Freelance Manager System_) ou à certains agrégats de page,
 nécessitent une stratégie mixte entre préparation d'état et stubbing ciblé.
 Cette prudence est essentielle. Présenter le seeding comme une solution
 universelle conduirait à déplacer la fragilité au lieu de la résoudre. La
@@ -703,8 +708,8 @@ effectives du système.
 Cette perspective change la signification du seeding. Tant que les fixtures
 appellent directement les bases, la suite reste étroitement couplée à un mode
 d'exécution local. En passant par une API de seeding, la logique de création
-des entités devient plus portable. Le dépôt fait apparaître cette évolution de
-façon nette : le service de seeding doit justement permettre l'exécution sur
+des entités devient plus portable. Cette évolution apparaît de façon nette :
+le service de seeding doit justement permettre l'exécution sur
 des environnements Fabrica, en remplaçant les accès directs aux bases par des
 appels plus abstraits et plus compatibles avec un environnement déployé. Le
 test gagne ainsi en découplage vis-à-vis de son support d'exécution.
@@ -713,8 +718,8 @@ L'apport de Fabrica ne doit cependant pas être idéalisé. Un environnement plu
 réaliste augmente aussi les exigences de cohérence. Le backend étudié mobilise
 de nombreux microservices, plusieurs stockages et un moteur de recherche ; une
 partie des parcours dépend donc non seulement des données créées, mais aussi de
-leur indexation et de la disponibilité des services associés. Le dépôt rappelle
-d'ailleurs que la reconstitution des données et la réindexation font partie des
+leur indexation et de la disponibilité des services associés. La reconstitution
+des données et la réindexation font d'ailleurs partie des
 opérations normales de mise en route. Cela signifie qu'une validation crédible
 sur environnement éphémère suppose davantage qu'un simple déploiement du front.
 Elle exige un état système suffisamment complet pour que les parcours basés sur
@@ -730,13 +735,13 @@ ne ferait qu'exposer plus vite les ambiguïtés existantes. Avec elle, il devien
 au contraire un levier puissant pour rapprocher la validation des conditions
 d'usage réelles sans s'enfermer dans une infrastructure permanente coûteuse.
 
-.Trajectoire vers une automatisation credible sur `develop`
+.Trajectoire vers une automatisation crédible sur `develop`
 image::images/fabrica-ci.svg[Trajectoire de validation via Fabrica et CI,align=center,pdfwidth=100%]
 
 === Conditions de passage vers une automatisation crédible sur `develop`
 
 Le passage à une automatisation crédible après merge sur `develop` ne peut donc
-pas être pensé comme une simple étape de pipeline. Le dépôt formule clairement
+pas être pensé comme une simple étape de pipeline. Il apparaît clairement
 que cet objectif dépend d'abord de la stabilisation des suites et de leur
 capacité à s'exécuter au-delà des postes individuels. Cette condition est
 fondamentale. Une automatisation précoce d'un dispositif encore incertain ne
@@ -790,7 +795,7 @@ initiative née d'un irritant local peut ainsi devenir un actif collectif, parce
 qu'elle réduit le coût de reproduction d'une bonne pratique.
 
 Il serait toutefois excessif de présenter la transformation comme achevée. Le
-dépôt montre au contraire que plusieurs tickets restent ouverts, que certaines
+constat conduit au contraire à reconnaître que certaines
 features doivent encore être découpées ou nettoyées, et que l'articulation
 entre seeding et stubbing n'est pas entièrement stabilisée sur les flux les
 plus hybrides. De même, l'exécution sur Fabrica et l'automatisation sur
@@ -809,6 +814,8 @@ ce premier levier prépare le second : une prévention plus crédible réduit le
 bruit, et permet ensuite d'aborder les questions d'observabilité avec une base
 de confiance plus solide.
 
+<<<
+
 == Second levier : renforcer la capacité de diagnostic sans surévaluer l'existant
 
 === État actuel des chantiers CloudWatch et Sentry
@@ -825,7 +832,7 @@ n'est donc ni improvisée ni marginale ; elle témoigne d'une volonté réelle
 d'inscrire l'observabilité dans l'architecture courante.
 
 Pour autant, il serait trompeur d'en déduire que la capacité de diagnostic est
-déjà pleinement satisfaisante. Les chantiers ouverts autour de Sentry et de
+déjà pleinement satisfaisante. Les besoins encore visibles autour de Sentry et de
 CloudWatch indiquent précisément l'inverse : l'outillage existe, mais son
 usage reste encore insuffisamment décisif pour identifier rapidement l'origine
 d'un incident en production. Le besoin formulé n'est pas seulement de capter
@@ -884,8 +891,8 @@ probable du problème, CloudWatch pour confirmer, contextualiser et suivre le
 chemin réel de l'exécution. C'est cette articulation qui rend le diagnostic
 plus robuste qu'une dépendance exclusive à l'un ou l'autre outil.
 
-.Complementarite entre Sentry et CloudWatch dans le diagnostic
-image::images/sentry-cloudwatch.svg[Complementarite entre Sentry et CloudWatch,align=center,pdfwidth=100%]
+.Complémentarité entre Sentry et CloudWatch dans le diagnostic
+image::images/sentry-cloudwatch.svg[Complémentarité entre Sentry et CloudWatch,align=center,pdfwidth=100%]
 
 === Apports attendus en temps d'investigation, coordination et maîtrise des coûts
 
@@ -896,7 +903,7 @@ un flux de messages identifiable, le temps perdu en hypothèses concurrentes se
 réduit. Les équipes passent moins de temps à reproduire à l'aveugle, à
 solliciter plusieurs interlocuteurs pour localiser la panne ou à relancer des
 tests uniquement pour préciser le périmètre du problème. Dans une organisation
-où front, backoffice, backend et infrastructure interagissent étroitement, cet
+où front, interface d'administration, backend et infrastructure interagissent étroitement, cet
 effet de réduction du temps mort a une portée concrète.
 
 La maîtrise des coûts apparaît alors sous plusieurs formes. Elle concerne
@@ -958,6 +965,8 @@ second levier complète le premier en transformant la fiabilité opérationnelle
 en ressource de pilotage. Mieux prévenir et mieux diagnostiquer relèvent d'une
 même logique : diminuer l'incertitude pour agir plus vite, avec moins de bruit
 et un coût de coordination plus soutenable.
+
+<<<
 
 == Conclusion
 
@@ -1061,44 +1070,67 @@ applications et une infrastructure dense, cette intelligibilité accroît la
 capacité d'initiative et soutient une industrialisation progressive ancrée dans
 les réalités du terrain.
 
+<<<
+
 == Lexique
 
+[[lexique-aws]]
 AWS:: Plateforme cloud d'Amazon utilisée pour héberger et piloter des services d'infrastructure.
 Dans le rapport, AWS est surtout associé aux environnements temporaires mobilisés pour rapprocher les validations de conditions proches du réel.
 
+[[lexique-backend]]
 backend:: Partie serveur du système, chargée de la logique métier, des accès aux données et des échanges entre services.
 Ici, le backend LeHibou est présenté comme un ensemble distribué de services qui soutiennent les flux métier et compliquent la validation de bout en bout.
 
-backoffice:: Application interne utilisée par les équipes pour piloter les opérations, suivre les dossiers et exécuter des tâches métier.
-Le terme désigne, dans ce document, une surface de production du service distincte du site public.
+[[lexique-backoffice]]
+backoffice:: Interface d'administration utilisée par les administrateurs de la plateforme pour piloter les opérations, suivre les dossiers et exécuter des tâches métier.
+Dans ce document, le terme désigne une surface interne distincte du site public et du backend, ce dernier correspondant à la partie serveur et aux services métier.
 
+[[lexique-bubo]]
 Bubo:: Nom d'une application interne de l'écosystème LeHibou.
-Elle apparaît dans le rapport comme un outil important des opérations internes et comme un périmètre concerné par les tests et la fiabilité globale.
+Elle apparaît dans le rapport comme un outil important des opérations internes, jouant le rôle de backoffice, et comme un périmètre concerné par les tests et la fiabilité globale.
 
+[[lexique-ci]]
 CI:: Abréviation de _continuous integration_, c'est-à-dire l'exécution automatisée de vérifications lors de l'intégration de changements dans le code.
 Le rapport l'évoque surtout à propos de l'automatisation des tests après fusion sur la branche `develop`.
 
+[[lexique-cloudwatch]]
 CloudWatch:: Service d'AWS utilisé pour centraliser des logs, des métriques et d'autres signaux techniques.
 Son intérêt, ici, est d'améliorer la lecture des incidents et de réduire le temps nécessaire au diagnostic.
 
+[[lexique-endpoint]]
 endpoint:: Point d'entrée précis d'un service, généralement exposé via une API ou une route HTTP.
 Dans le rapport, identifier rapidement l'endpoint concerné permet de localiser plus vite l'origine probable d'un incident.
 
+[[lexique-fabrica]]
 Fabrica:: Nom de l'outillage interne servant à créer des environnements AWS temporaires, complets et proches du réel.
 Le projet est central dans le document car il permet d'exécuter des validations plus réalistes que de simples setups locaux.
 
+[[lexique-fms]]
+FMS:: Abréviation de _Freelance Manager System_.
+Dans le rapport, FMS désigne une offre ou un périmètre fonctionnel de la plateforme pris en compte dans certains parcours applicatifs et dans certains arbitrages entre seeding et stubbing.
+
+[[lexique-front-public]]
 front public:: Partie visible par les utilisateurs externes, qui regroupe les parcours d'acquisition, de recherche, d'inscription et de consultation.
 Le rapport l'oppose aux outils internes pour montrer que la fiabilité doit être pensée sur plusieurs surfaces applicatives.
 
+[[lexique-leads]]
+leads:: Opportunités commerciales ou prises de contact qualifiées susceptibles d'alimenter le pipeline de vente.
+Dans le rapport, les leads font partie des flux métier suivis par les outils internes et participent à la chaîne de transformation entre acquisition, qualification et mission.
+
+[[lexique-microservice]]
 microservice:: Service applicatif spécialisé dans une responsabilité limitée, intégré à un ensemble plus large de services.
 Le document souligne que cette organisation augmente la complexité des dépendances et rend les validations de bout en bout plus exigeantes.
 
+[[lexique-observabilite]]
 observabilité:: Capacité d'un système à fournir des informations exploitables pour comprendre son état et analyser ses incidents.
 Ici, l'observabilité repose surtout sur la qualité des signaux remontés par Sentry et CloudWatch.
 
+[[lexique-sentry]]
 Sentry:: Outil de suivi des erreurs et d'analyse des incidents applicatifs.
 Dans le rapport, Sentry sert à mieux rattacher un bug à un service, un endpoint ou un parcours donné.
 
+[[lexique-seeding]]
 seeding:: Préparation contrôlée de données de test ou d'états métier nécessaires à l'exécution d'un scénario.
 Le seeding est présenté comme un levier majeur pour rendre les tests plus autonomes, plus reproductibles et plus compatibles avec Fabrica.
 
