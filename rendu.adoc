@@ -796,17 +796,16 @@ de confiance plus solide.
 
 === État actuel des chantiers CloudWatch et Sentry
 
-Le second levier ne part pas d'un vide instrumental. Le dépôt montre au
-contraire que Sentry est déjà branché à plusieurs niveaux du système. Côté
-front, les erreurs API sont capturées avec des informations de contexte comme
-l'identifiant de requête, l'URL appelée, le code de statut et, lorsqu'il est
-disponible, l'utilisateur concerné. Côté backend, une bibliothèque transverse
-alimente Sentry dans de nombreux microservices et y rattache d'emblée un tag
-de microservice. Les interceptors en place enrichissent aussi les événements
-selon le type de flux traité : requête HTTP, appel gRPC, message RabbitMQ ou
-événement WebSocket. Cette base n'est donc ni improvisée ni marginale ; elle
-témoigne d'une volonté réelle d'inscrire l'observabilité dans l'architecture
-courante.
+Le second levier ne part pas d'un vide instrumental. Sentry est déjà intégré à
+plusieurs niveaux du système. Côté front, les erreurs API sont capturées avec
+des informations de contexte comme l'identifiant de requête, l'URL appelée, le
+code de statut et, lorsqu'il est disponible, l'utilisateur concerné. Côté
+backend, une bibliothèque transverse alimente Sentry dans de nombreux
+microservices et y rattache d'emblée un tag de microservice. Les interceptors
+en place enrichissent aussi les événements selon le type de flux traité :
+requête HTTP, appel gRPC, message RabbitMQ ou événement WebSocket. Cette base
+n'est donc ni improvisée ni marginale ; elle témoigne d'une volonté réelle
+d'inscrire l'observabilité dans l'architecture courante.
 
 Pour autant, il serait trompeur d'en déduire que la capacité de diagnostic est
 déjà pleinement satisfaisante. Les chantiers ouverts autour de Sentry et de
@@ -815,9 +814,9 @@ usage reste encore insuffisamment décisif pour identifier rapidement l'origine
 d'un incident en production. Le besoin formulé n'est pas seulement de capter
 des erreurs, mais de pouvoir relier un signal à un service, à un endpoint, à
 un contexte d'exécution et, si possible, à un parcours métier intelligible.
-De même, le sujet CloudWatch est posé en termes d'amélioration des logs, de
+De même, le sujet CloudWatch se pose en termes d'amélioration des logs, de
 couverture plus large des applications et de meilleure maîtrise du niveau de
-verbosité. L'état observé correspond donc à une observabilité présente, mais
+verbosité. L'ensemble correspond donc à une observabilité présente, mais
 encore inégalement exploitable.
 
 === Améliorations visées dans la lisibilité des incidents
@@ -863,7 +862,7 @@ isolée, même correctement remontée, ne suffit pas toujours à distinguer une
 erreur de bord d'un défaut plus profond de propagation ou de données. À
 l'inverse, des logs abondants mais mal ciblés risquent de noyer l'information
 utile. L'objectif n'est donc pas de juxtaposer deux sources de signal, mais de
-les rendre mutuellement fécondes : Sentry pour pointer rapidement le lieu
+mieux les faire fonctionner ensemble : Sentry pour pointer rapidement le lieu
 probable du problème, CloudWatch pour confirmer, contextualiser et suivre le
 chemin réel de l'exécution. C'est cette articulation qui rend le diagnostic
 plus robuste qu'une dépendance exclusive à l'un ou l'autre outil.
@@ -894,9 +893,9 @@ distribué.
 
 === Limites, dépendances et mesures restant à mettre en oeuvre
 
-Il convient néanmoins de garder une lecture prudente du chantier. Les tickets
-ouverts montrent que plusieurs mesures importantes restent à concrétiser. Pour
-CloudWatch, la centralisation des logs de toutes les applications n'est pas
+Il convient néanmoins de garder une lecture prudente du chantier. Plusieurs
+mesures importantes restent encore à concrétiser. Pour CloudWatch, la
+centralisation des logs de toutes les applications n'est pas
 présentée comme achevée. La question de la journalisation des adresses IP
 utilisateur, ainsi que celle du filtrage des logs de debug en production,
 indique que la gouvernance même du signal est encore en cours de définition.
@@ -944,6 +943,100 @@ et un coût de coordination plus soutenable.
 
 === Bilan de la démarche
 
+La démarche étudiée dans ce rapport ne se réduit ni à une suite de correctifs
+isolés, ni à une amélioration ponctuelle du confort de développement. Elle
+s'organise autour d'un problème plus structurant : dans un système composé de
+plusieurs applications, de microservices et d'environnements multiples, la
+fiabilité opérationnelle conditionne directement la capacité à livrer,
+diagnostiquer et arbitrer sans surcharge excessive. Sous cet angle, le
+rapprochement entre stabilisation des tests end-to-end et montée en lisibilité
+de l'observabilité ne relève pas d'un simple voisinage thématique. Il traduit
+une même recherche de maîtrise, fondée à la fois sur la réduction de l'aléa en
+amont et sur l'amélioration du diagnostic lorsque cet aléa subsiste.
+
+Le premier apport de la mission tient ainsi à la clarification des causes
+concrètes d'instabilité dans les validations fonctionnelles. Les suites
+end-to-end ne sont pas fragiles par principe ; elles le deviennent lorsque la
+création des données, les connexions utilisateur, les dépendances entre
+scénarios et l'état de l'environnement restent implicites. Le travail engagé
+autour d'un socle de seeding commun, de conventions de connexion plus nettes et
+de scénarios rendus autonomes répond précisément à cette difficulté. Il ne
+s'agit plus d'accumuler des parcours exhaustifs, mais de reconstruire des
+validations plus déterministes, mieux circonscrites et donc plus crédibles.
+Cette évolution est décisive, car elle transforme le test end-to-end en outil
+de décision plutôt qu'en source récurrente de doute.
+
+Le second apport réside dans le déplacement du regard porté sur le monitoring.
+La présence de Sentry dans les frontends comme dans le backend, l'existence
+d'une bibliothèque transverse capable d'attacher un contexte technique riche,
+ainsi que l'attention portée aux logs et aux signaux remontés en environnement
+réel, montrent qu'un socle d'observabilité est déjà là. Pourtant, l'enjeu mis
+en évidence n'est pas l'absence d'outils, mais l'écart entre instrumentation et
+exploitabilité. Dès lors, la mission prend une portée plus large : elle vise à
+faire de la fiabilité une ressource collective de pilotage, en réduisant le
+temps perdu à reconstituer les causes, à coordonner les acteurs et à distinguer
+le signal utile du bruit.
+
 === Ce que la mission apporte déjà et ce qui reste à consolider
 
+Les éléments déjà en place permettent d'identifier une valeur produite avant
+même la clôture complète des chantiers. Du côté des validations, la logique de
+seeding rend possible une séparation plus nette entre ce qui doit être préparé
+par l'environnement et ce qui doit être véritablement vérifié par l'interface.
+Les scénarios gagnent ainsi en lisibilité, car ils explicitent leurs
+préconditions au lieu d'hériter d'un état construit par un autre test ou par
+des fixtures difficilement maintenables. Leur exécution s'accorde aussi
+davantage avec des environnements réalistes. Cette orientation ne garantit pas
+encore, à elle seule, une chaîne entièrement industrialisée ; elle constitue en
+revanche un changement de méthode déjà significatif.
+
+Une progression comparable s'observe pour l'observabilité. Le backend dispose
+déjà de mécanismes transverses capables d'associer aux erreurs des informations
+de contexte selon plusieurs protocoles, tandis que les applications clientes
+font remonter leurs propres événements. Cet existant fournit une base sérieuse
+pour mieux relier un incident à un microservice, à un endpoint ou à un parcours
+utilisateur. En ce sens, la mission montre que la difficulté n'est pas de
+partir de zéro, mais de rendre plus cohérents les conventions, les métadonnées
+et la hiérarchie des signaux produits.
+
+Il serait toutefois excessif d'en conclure que la fiabilité visée est déjà
+atteinte. Plusieurs dépendances demeurent. Les migrations de suites
+end-to-end ne sont pas toutes achevées, certains flux hybrides exigent encore
+un arbitrage explicite entre seeding et stubbing, et la robustesse du dispositif
+reste liée à la qualité des données de référence ainsi qu'à la disponibilité
+d'environnements d'exécution suffisamment représentatifs. De même, du côté de
+Sentry et de CloudWatch, la simple collecte ne suffit pas : il faut encore
+consolider la qualité des messages, limiter les remontées bruitées, stabiliser
+les conventions de tagging et faire en sorte que les équipes lisent ces signaux
+selon un cadre partagé. La mission apporte donc déjà une direction solide, mais
+sa pleine efficacité dépend encore d'une mise en cohérence technique et
+organisationnelle.
+
 === Perspectives d'amélioration et potentiel de diffusion à l'échelle de l'entreprise
+
+La principale perspective ouverte par cette mission tient à sa capacité de
+diffusion. Les solutions envisagées ne répondent pas seulement à un incident
+local ou à une suite de tests particulière. Lorsqu'un seeding devient assez
+stable pour décrire des états métier récurrents, lorsqu'un environnement
+temporaire permet de rejouer ces validations dans des conditions proches du
+réel, et lorsqu'un système de monitoring rend les incidents plus vite
+attribuables, c'est l'ensemble de la chaîne de livraison qui gagne en
+prévisibilité. La valeur du chantier dépasse alors le périmètre initial.
+
+Cette diffusion suppose néanmoins une industrialisation progressive. Il ne
+s'agirait pas d'imposer un modèle uniforme sans discernement, mais de préserver
+ce qui fait la pertinence du travail engagé : explicitation des préconditions,
+autonomie des scénarios, séparation entre setup technique et comportement
+vérifié, contextualisation utile des erreurs, et articulation entre traces
+applicatives et logs d'exécution. Une telle généralisation demanderait de
+consolider des contrats communs et de mieux partager les conventions entre
+équipes.
+
+Au terme de cette analyse, la mission montre qu'une amélioration continue utile
+repose moins sur la multiplication des contrôles que sur une meilleure
+intelligibilité du système. Renforcer la fiabilité opérationnelle consiste
+alors à permettre des interventions plus rapides, des hypothèses mieux fondées
+et une coordination moins coûteuse. Dans une entreprise appuyée sur plusieurs
+applications et une infrastructure dense, cette intelligibilité accroît la
+capacité d'initiative et soutient une industrialisation progressive ancrée dans
+les réalités du terrain.
