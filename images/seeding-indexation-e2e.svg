@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="260" viewBox="0 0 1080 260">
+  <defs>
+    <marker id="arrow-brown" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b5e34"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b56576"/>
+    </marker>
+    <style>
+      .box { fill: #fff8f0; stroke: #8b5e34; stroke-width: 2.5; rx: 14; ry: 14; }
+      .warn { fill: #fde7ea; stroke: #b56576; stroke-width: 2.5; rx: 14; ry: 14; }
+      .label { font-family: Arial, sans-serif; font-size: 20px; fill: #1f2933; text-anchor: middle; dominant-baseline: middle; }
+      .small { font-size: 16px; }
+      .arrow { stroke: #8b5e34; stroke-width: 4; fill: none; marker-end: url(#arrow-brown); }
+      .warn-arrow { stroke: #b56576; stroke-width: 4; fill: none; stroke-dasharray: 10 8; marker-end: url(#arrow-red); }
+    </style>
+  </defs>
+
+  <rect class="box" x="40" y="100" width="160" height="64"/>
+  <text class="label" x="120" y="132">Seeder API</text>
+
+  <rect class="box" x="250" y="100" width="180" height="64"/>
+  <text class="label" x="340" y="132">Donnees metier</text>
+
+  <rect class="box" x="480" y="100" width="180" height="64"/>
+  <text class="label" x="570" y="132">Reindexation</text>
+
+  <rect class="box" x="710" y="100" width="160" height="64"/>
+  <text class="label" x="790" y="132">Recherche</text>
+
+  <rect class="box" x="920" y="100" width="120" height="64"/>
+  <text class="label" x="980" y="132">Test E2E</text>
+
+  <rect class="box" x="250" y="24" width="260" height="46"/>
+  <text class="label small" x="380" y="47">Environnement local ou Fabrica</text>
+
+  <rect class="warn" x="676" y="196" width="300" height="42"/>
+  <text class="label small" x="826" y="217">Index absent ou preconditions implicites</text>
+
+  <path class="arrow" d="M 200 132 L 250 132"/>
+  <path class="arrow" d="M 430 132 L 480 132"/>
+  <path class="arrow" d="M 660 132 L 710 132"/>
+  <path class="arrow" d="M 870 132 L 920 132"/>
+  <path class="arrow" d="M 380 70 L 380 100"/>
+  <path class="warn-arrow" d="M 826 196 L 980 164"/>
+</svg>

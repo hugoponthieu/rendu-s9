@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="380" viewBox="0 0 1080 380">
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1d4e89"/>
+    </marker>
+    <style>
+      .box { fill: #f7fbff; stroke: #1d4e89; stroke-width: 2.5; rx: 14; ry: 14; }
+      .side { fill: #eef6ff; }
+      .support { fill: #f5f1e8; stroke: #8a6d3b; }
+      .label { font-family: Arial, sans-serif; font-size: 20px; fill: #1f2933; text-anchor: middle; dominant-baseline: middle; }
+      .small { font-size: 17px; }
+      .arrow { stroke: #1d4e89; stroke-width: 4; fill: none; marker-end: url(#arrow-blue); }
+      .hint { font-family: Arial, sans-serif; font-size: 15px; fill: #4b5563; }
+    </style>
+  </defs>
+
+  <rect class="box side" x="40" y="70" width="200" height="68"/>
+  <text class="label" x="140" y="104">Utilisateurs externes</text>
+
+  <rect class="box side" x="40" y="230" width="200" height="68"/>
+  <text class="label" x="140" y="264">Equipes internes</text>
+
+  <rect class="box" x="320" y="70" width="200" height="68"/>
+  <text class="label" x="420" y="104">Front public</text>
+
+  <rect class="box" x="320" y="230" width="200" height="68"/>
+  <text class="label" x="420" y="264">Backoffice Bubo</text>
+
+  <rect class="box" x="600" y="150" width="220" height="76"/>
+  <text class="label" x="710" y="188">Backend microservices</text>
+
+  <rect class="box side" x="900" y="30" width="150" height="56"/>
+  <text class="label small" x="975" y="58">Bases</text>
+
+  <rect class="box side" x="900" y="118" width="150" height="56"/>
+  <text class="label small" x="975" y="146">Recherche</text>
+
+  <rect class="box side" x="900" y="206" width="150" height="56"/>
+  <text class="label small" x="975" y="234">Messagerie</text>
+
+  <rect class="box support" x="320" y="324" width="200" height="40"/>
+  <text class="label small" x="420" y="344">Fabrica</text>
+
+  <rect class="box support" x="600" y="324" width="220" height="40"/>
+  <text class="label small" x="710" y="344">Observabilite</text>
+
+  <path class="arrow" d="M 240 104 L 320 104"/>
+  <path class="arrow" d="M 240 264 L 320 264"/>
+  <path class="arrow" d="M 520 104 L 600 170"/>
+  <path class="arrow" d="M 520 264 L 600 206"/>
+  <path class="arrow" d="M 820 170 L 900 58"/>
+  <path class="arrow" d="M 820 188 L 900 146"/>
+  <path class="arrow" d="M 820 206 L 900 234"/>
+  <path class="arrow" d="M 420 324 L 420 298"/>
+  <path class="arrow" d="M 420 298 L 600 298 L 600 226"/>
+  <path class="arrow" d="M 710 324 L 710 226"/>
+
+  <text class="hint" x="510" y="316">Environnement de validation</text>
+  <text class="hint" x="800" y="316">Diagnostic et supervision</text>
+</svg>

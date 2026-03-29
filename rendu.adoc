@@ -6,6 +6,8 @@ Author Name
 :sectnums:
 :title-page:
 :icons: font
+:pdf-themesdir: {docdir}
+:pdf-theme: theme.yml
 
 == Introduction
 
@@ -61,6 +63,9 @@ manuelles. Autrement dit, la mission relie directement des choix techniques à
 des enjeux d'efficacité opérationnelle, de qualité de service et de maîtrise
 des coûts.
 
+.Vue d'ensemble simplifiee de l'ecosysteme technique
+image::images/ecosysteme-general.svg[Vue d'ensemble de l'ecosysteme technique,align=center,pdfwidth=100%]
+
 === Problématique
 
 Le cœur du problème peut se formuler de la manière suivante : comment
@@ -109,6 +114,9 @@ progrès demeurent soutenables, c'est-à-dire compatibles avec le réalisme des
 environnements, le temps disponible des équipes et la maîtrise des coûts
 techniques et organisationnels. C'est dans cette tension entre prévention,
 diagnostic et économie de coordination que se situe la contribution étudiée.
+
+.Tension centrale entre prevention, diagnostic et couts
+image::images/triangle-problematique.svg[Triangle prevention diagnostic couts,align=center,pdfwidth=80%]
 
 === Démarche retenue
 
@@ -470,6 +478,9 @@ business est ambivalent : l'entreprise dispose d'un levier puissant pour
 rapprocher la validation du réel, mais ne capte pas encore tout son bénéfice
 faute d'un outillage de préparation suffisamment homogène.
 
+.Dependance entre seeding, indexation et fiabilite des scenarios E2E
+image::images/seeding-indexation-e2e.svg[Seeding indexation et tests E2E,align=center,pdfwidth=100%]
+
 === Limites de l'observabilité et du diagnostic
 
 Le second foyer de fragilité concerne l'observabilité. Les outils existent déjà
@@ -632,6 +643,9 @@ des domaines métier nombreux, ce recentrage est essentiel. Sans lui, la
 validation de bout en bout resterait exposée à l'hétérogénéité du système au
 lieu de la maîtriser.
 
+.Passage d'un corpus fragile a un socle E2E plus reproductible
+image::images/avant-apres-socle-e2e.svg[Avant apres du socle E2E,align=center,pdfwidth=100%]
+
 === Rôle du seeding et de la normalisation des accès
 
 Le seeding occupe ici une fonction structurante. Il ne s'agit pas seulement
@@ -715,6 +729,9 @@ périphériques correctement traitées. Sans cette base, l'environnement réalis
 ne ferait qu'exposer plus vite les ambiguïtés existantes. Avec elle, il devient
 au contraire un levier puissant pour rapprocher la validation des conditions
 d'usage réelles sans s'enfermer dans une infrastructure permanente coûteuse.
+
+.Trajectoire vers une automatisation credible sur `develop`
+image::images/fabrica-ci.svg[Trajectoire de validation via Fabrica et CI,align=center,pdfwidth=100%]
 
 === Conditions de passage vers une automatisation crédible sur `develop`
 
@@ -866,6 +883,9 @@ mieux les faire fonctionner ensemble : Sentry pour pointer rapidement le lieu
 probable du problème, CloudWatch pour confirmer, contextualiser et suivre le
 chemin réel de l'exécution. C'est cette articulation qui rend le diagnostic
 plus robuste qu'une dépendance exclusive à l'un ou l'autre outil.
+
+.Complementarite entre Sentry et CloudWatch dans le diagnostic
+image::images/sentry-cloudwatch.svg[Complementarite entre Sentry et CloudWatch,align=center,pdfwidth=100%]
 
 === Apports attendus en temps d'investigation, coordination et maîtrise des coûts
 
@@ -1040,3 +1060,50 @@ et une coordination moins coûteuse. Dans une entreprise appuyée sur plusieurs
 applications et une infrastructure dense, cette intelligibilité accroît la
 capacité d'initiative et soutient une industrialisation progressive ancrée dans
 les réalités du terrain.
+
+== Lexique
+
+AWS:: Plateforme cloud d'Amazon utilisée pour héberger et piloter des services d'infrastructure.
+Dans le rapport, AWS est surtout associé aux environnements temporaires mobilisés pour rapprocher les validations de conditions proches du réel.
+
+backend:: Partie serveur du système, chargée de la logique métier, des accès aux données et des échanges entre services.
+Ici, le backend LeHibou est présenté comme un ensemble distribué de services qui soutiennent les flux métier et compliquent la validation de bout en bout.
+
+backoffice:: Application interne utilisée par les équipes pour piloter les opérations, suivre les dossiers et exécuter des tâches métier.
+Le terme désigne, dans ce document, une surface de production du service distincte du site public.
+
+Bubo:: Nom d'une application interne de l'écosystème LeHibou.
+Elle apparaît dans le rapport comme un outil important des opérations internes et comme un périmètre concerné par les tests et la fiabilité globale.
+
+CI:: Abréviation de _continuous integration_, c'est-à-dire l'exécution automatisée de vérifications lors de l'intégration de changements dans le code.
+Le rapport l'évoque surtout à propos de l'automatisation des tests après fusion sur la branche `develop`.
+
+CloudWatch:: Service d'AWS utilisé pour centraliser des logs, des métriques et d'autres signaux techniques.
+Son intérêt, ici, est d'améliorer la lecture des incidents et de réduire le temps nécessaire au diagnostic.
+
+endpoint:: Point d'entrée précis d'un service, généralement exposé via une API ou une route HTTP.
+Dans le rapport, identifier rapidement l'endpoint concerné permet de localiser plus vite l'origine probable d'un incident.
+
+Fabrica:: Nom de l'outillage interne servant à créer des environnements AWS temporaires, complets et proches du réel.
+Le projet est central dans le document car il permet d'exécuter des validations plus réalistes que de simples setups locaux.
+
+front public:: Partie visible par les utilisateurs externes, qui regroupe les parcours d'acquisition, de recherche, d'inscription et de consultation.
+Le rapport l'oppose aux outils internes pour montrer que la fiabilité doit être pensée sur plusieurs surfaces applicatives.
+
+microservice:: Service applicatif spécialisé dans une responsabilité limitée, intégré à un ensemble plus large de services.
+Le document souligne que cette organisation augmente la complexité des dépendances et rend les validations de bout en bout plus exigeantes.
+
+observabilité:: Capacité d'un système à fournir des informations exploitables pour comprendre son état et analyser ses incidents.
+Ici, l'observabilité repose surtout sur la qualité des signaux remontés par Sentry et CloudWatch.
+
+Sentry:: Outil de suivi des erreurs et d'analyse des incidents applicatifs.
+Dans le rapport, Sentry sert à mieux rattacher un bug à un service, un endpoint ou un parcours donné.
+
+seeding:: Préparation contrôlée de données de test ou d'états métier nécessaires à l'exécution d'un scénario.
+Le seeding est présenté comme un levier majeur pour rendre les tests plus autonomes, plus reproductibles et plus compatibles avec Fabrica.
+
+tests end-to-end (E2E):: Tests qui valident un parcours complet en traversant plusieurs couches du système, de l'interface jusqu'aux services et aux données.
+Ils occupent une place centrale dans le rapport, car leur stabilisation conditionne la crédibilité de l'automatisation et du signal de validation.
+
+`develop`:: Nom de la branche de développement sur laquelle les changements sont fusionnés avant d'éventuelles étapes de livraison.
+Le rapport la mentionne comme point de passage visé pour déclencher automatiquement des validations fiables.

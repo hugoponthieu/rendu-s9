@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="280" viewBox="0 0 1080 280">
+  <defs>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4a4e69"/>
+    </marker>
+    <style>
+      .box { fill: #f4eef5; stroke: #4a4e69; stroke-width: 2.5; rx: 14; ry: 14; }
+      .label { font-family: Arial, sans-serif; font-size: 19px; fill: #22223b; text-anchor: middle; dominant-baseline: middle; }
+      .small { font-size: 16px; }
+      .arrow { stroke: #4a4e69; stroke-width: 4; fill: none; marker-end: url(#arrow-purple); }
+    </style>
+  </defs>
+
+  <rect class="box" x="30" y="110" width="160" height="62"/>
+  <text class="label" x="110" y="141">Incident visible</text>
+
+  <rect class="box" x="240" y="110" width="150" height="62"/>
+  <text class="label" x="315" y="141">Sentry</text>
+
+  <rect class="box" x="440" y="110" width="220" height="62"/>
+  <text class="label small" x="550" y="133">Service, endpoint</text>
+  <text class="label small" x="550" y="152">et contexte probable</text>
+
+  <rect class="box" x="710" y="110" width="170" height="62"/>
+  <text class="label" x="795" y="141">CloudWatch</text>
+
+  <rect class="box" x="920" y="44" width="130" height="52"/>
+  <text class="label small" x="985" y="66">Sequence</text>
+  <text class="label small" x="985" y="84">d'execution</text>
+
+  <rect class="box" x="920" y="184" width="130" height="52"/>
+  <text class="label small" x="985" y="206">Diagnostic</text>
+  <text class="label small" x="985" y="224">exploitable</text>
+
+  <path class="arrow" d="M 190 141 L 240 141"/>
+  <path class="arrow" d="M 390 141 L 440 141"/>
+  <path class="arrow" d="M 660 141 L 710 141"/>
+  <path class="arrow" d="M 880 141 L 920 70"/>
+  <path class="arrow" d="M 880 141 L 920 210"/>
+</svg>

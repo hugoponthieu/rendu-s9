@@ -1,0 +1,4 @@
+extends: default
+
+image_caption_align: center
+image_caption_text_align: center
