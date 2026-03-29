@@ -549,15 +549,248 @@ de fonctionnement collectif.
 
 === Reprise critique de l'existant et priorisation des points de rupture
 
+Le premier levier de transformation consiste à reprendre les validations
+end-to-end à partir de leurs points de rupture les plus manifestes, et non à
+ajouter immédiatement de nouveaux scénarios. Le dépôt met en évidence une
+situation où la difficulté ne provient pas d'un déficit d'intention de test,
+mais d'un défaut de fiabilité du signal produit. Certains parcours échouent
+encore selon la machine d'exécution, d'autres dépendent d'un ordre implicite
+entre scénarios, et plusieurs suites mobilisent des comptes ou des états
+préalables qui ne relèvent pas du comportement réellement évalué. Dans un tel
+cadre, l'accumulation de cas de test n'augmente pas mécaniquement la sécurité ;
+elle peut au contraire multiplier les faux négatifs et brouiller la lecture
+des régressions réelles.
+
+La priorité logique consiste donc à distinguer ce qui relève d'un comportement
+métier à contrôler de ce qui n'est qu'un artefact de préparation. Les travaux
+engagés autour des flux mission, des suites LeHibou hors mission et des jeux de
+données Bubo convergent sur ce point. Ils ne visent pas seulement à "faire
+passer" des scénarios existants, mais à supprimer les dépendances entre tests,
+les doubles connexions, les enchaînements de transitions de compte et les
+préconditions construites par l'interface alors qu'elles devraient être
+fournies par le contexte d'exécution. Cette lecture critique déplace le centre
+de gravité du sujet : la fragilité n'est pas seulement un problème de script,
+elle traduit une confusion entre validation fonctionnelle et fabrication du
+terrain de test.
+
+Une telle reprise impose également une hiérarchisation. Les flux ciblés en
+premier ne sont pas choisis au hasard. Les scénarios mission simples servent à
+valider le contrat minimal du seeding, parce qu'ils permettent d'observer si
+une mission peut être rendue visible, modifiable, archivable ou searchable sans
+recourir à des manipulations UI parasites. Les scénarios multi-acteurs sont
+traités ensuite, car ils révèlent une difficulté d'un autre ordre : la
+nécessité de reproduire proprement des relations entre client, freelance,
+candidature, offre et notification. Cette progression témoigne d'une démarche
+de socle. Il s'agit d'abord de sécuriser les dépendances élémentaires, puis
+d'étendre la méthode à des parcours plus riches.
+
+Cette priorisation a un effet organisationnel direct. Tant qu'un test échoue
+sans que l'on sache s'il signale une régression, un problème de machine, un
+compte devenu invalide ou un état métier mal préparé, la chaîne de livraison
+reste suspendue à de multiples vérifications humaines. Reprendre l'existant
+revient donc à restaurer une propriété essentielle de la validation : sa
+capacité à être crue. C'est précisément cette crédibilité qui manque à un
+dispositif où les scénarios trop larges, dupliqués ou dépendants de setups
+implicites entretiennent un doute structurel.
+
 === Construction d'un socle de test plus reproductible
+
+La réponse apportée dans le dépôt ne passe pas par une sophistication accrue
+des scripts, mais par la construction d'un socle plus reproductible. Cette
+orientation apparaît dans la volonté d'isoler les scénarios, de conserver en
+interface seulement le comportement effectivement observé, et de déplacer hors
+du test ce qui relève de la mise en place du contexte. En d'autres termes, un
+parcours end-to-end crédible n'est pas un parcours qui "fait tout" ; c'est un
+parcours qui vérifie un enchaînement métier déterminé sur un état initial
+connu.
+
+Ce changement est particulièrement visible dans la migration des suites mission.
+L'objectif n'est plus de créer une mission par l'interface pour permettre à un
+autre scénario de la consulter ensuite, mais de disposer d'une mission déjà
+préparée dans l'état utile au test. Le gain attendu est double. D'une part, le
+scénario devient plus lisible : il exprime plus clairement ce qu'il contrôle.
+D'autre part, il devient rejouable sans dépendre d'une exécution précédente.
+Cette autonomie est décisive pour toute industrialisation ultérieure, car une
+suite qui suppose un ordre fixe ou un état ambiant ne supporte ni l'exécution
+parallèle, ni la répétition, ni l'usage dans des environnements éphémères.
+
+Le même raisonnement s'étend aux flux qui ne relèvent pas principalement du
+domaine mission. Les parcours d'alertes, de favoris, de références ou de
+gestion de compte ne peuvent pas être durablement fiabilisés si des inscriptions
+ou des logins ne servent qu'à préparer une condition d'essai. Le dépôt montre
+au contraire une recherche de séparation entre les véritables tests de signup,
+qui doivent rester pilotés par l'interface, et les créations d'utilisateurs qui
+ne sont qu'un moyen de disposer d'un acteur authentifié dans un état précis.
+Cette distinction évite de confondre la validation d'une fonctionnalité avec la
+reproduction laborieuse d'un contexte.
+
+Le socle reproductible se lit ainsi comme une forme de discipline de test. Il
+réduit les préconditions implicites, clarifie les responsabilités entre setup et
+vérification, et rend les suites plus aptes à être comprises, maintenues puis
+partagées. Dans un écosystème où le front public, Bubo et le backend traversent
+des domaines métier nombreux, ce recentrage est essentiel. Sans lui, la
+validation de bout en bout resterait exposée à l'hétérogénéité du système au
+lieu de la maîtriser.
 
 === Rôle du seeding et de la normalisation des accès
 
+Le seeding occupe ici une fonction structurante. Il ne s'agit pas seulement
+d'automatiser la création de quelques données, mais d'instaurer une manière
+cohérente de produire les états nécessaires à la validation. Les travaux
+documentés distinguent explicitement les rôles minimaux à couvrir, les contrats
+de données utiles et les tâches d'intégration permettant aux suites de
+consommer ces jeux de données de manière homogène. Cette orientation répond à
+une limite bien identifiée : l'usage de comptes statiques, de credentials
+partagés ou d'alias hétérogènes fragilise autant l'exécution que la maintenance.
+
+Le bénéfice du seeding est d'abord conceptuel. Lorsqu'une mission publiée, une
+candidature, un favori, une alerte ou un lead gagné peuvent être créés par un
+contrat explicite, le test cesse d'être une narration approximative de ce qu'il
+faudrait obtenir ; il devient la vérification d'un comportement à partir d'un
+état déclaré. La valeur du dispositif tient alors moins à la quantité de
+données créées qu'à la qualité de la convention commune qui les décrit. Le cas
+des flux multi-acteurs est révélateur. Pour vérifier un enchaînement entre
+client, freelance et administration, il faut que les rôles soient produits de
+façon cohérente et qu'ils puissent être mobilisés sans ambiguïté par les suites.
+
+Cette normalisation ne concerne pas seulement les entités métier. Elle touche
+aussi l'accès au système. Le pattern combinant tâche de préparation et connexion
+par API vise précisément à éviter que chaque feature réinvente ses propres
+étapes d'authentification. Une telle homogénéisation réduit l'exposition aux
+comptes partagés, mais elle a surtout un effet méthodologique : elle permet de
+faire du login un mécanisme d'entrée standardisé, au lieu d'un bricolage local
+ajouté au scénario. Le résultat attendu n'est pas seulement une baisse de
+l'instabilité ; c'est aussi une meilleure diffusion des pratiques entre suites
+LeHibou et suites Bubo.
+
+Le seeding fait toutefois apparaître une limite importante, que le dépôt traite
+avec justesse. Tout ne peut pas être seedé de la même manière. Certains flux,
+notamment ceux qui touchent aux emails, à FMS ou à certains agrégats de page,
+nécessitent une stratégie mixte entre préparation d'état et stubbing ciblé.
+Cette prudence est essentielle. Présenter le seeding comme une solution
+universelle conduirait à déplacer la fragilité au lieu de la résoudre. La
+démarche retenue paraît plus solide : expliciter, feature par feature, ce qui
+relève d'un état métier reproductible et ce qui doit rester simulé pour ne pas
+faire dépendre la suite d'un système périphérique instable ou trop coûteux à
+mobiliser.
+
 === Intégration progressive dans des environnements Fabrica réalistes
+
+L'intégration à Fabrica donne à ce premier levier une portée plus large que la
+simple stabilisation locale. Dans l'écosystème observé, Fabrica n'est pas un
+environnement de démonstration minimal, mais une plateforme d'environnements
+éphémères complets, proches de la production, avec plusieurs services, des
+données restaurées et un nettoyage automatique destiné à limiter les coûts. Son
+intérêt, pour la validation end-to-end, est de fournir un terrain
+intermédiaire entre le développement local et la production réelle. Les tests
+peuvent alors être rejoués dans un contexte plus représentatif des dépendances
+effectives du système.
+
+Cette perspective change la signification du seeding. Tant que les fixtures
+appellent directement les bases, la suite reste étroitement couplée à un mode
+d'exécution local. En passant par une API de seeding, la logique de création
+des entités devient plus portable. Le dépôt fait apparaître cette évolution de
+façon nette : le service de seeding doit justement permettre l'exécution sur
+des environnements Fabrica, en remplaçant les accès directs aux bases par des
+appels plus abstraits et plus compatibles avec un environnement déployé. Le
+test gagne ainsi en découplage vis-à-vis de son support d'exécution.
+
+L'apport de Fabrica ne doit cependant pas être idéalisé. Un environnement plus
+réaliste augmente aussi les exigences de cohérence. Le backend étudié mobilise
+de nombreux microservices, plusieurs stockages et un moteur de recherche ; une
+partie des parcours dépend donc non seulement des données créées, mais aussi de
+leur indexation et de la disponibilité des services associés. Le dépôt rappelle
+d'ailleurs que la reconstitution des données et la réindexation font partie des
+opérations normales de mise en route. Cela signifie qu'une validation crédible
+sur environnement éphémère suppose davantage qu'un simple déploiement du front.
+Elle exige un état système suffisamment complet pour que les parcours basés sur
+la recherche, la mission ou les flux internes produisent des résultats
+cohérents.
+
+C'est pourquoi l'intégration à Fabrica est présentée plus justement comme une
+trajectoire que comme un acquis. Elle accroît la crédibilité du signal de test,
+mais elle ne la garantit qu'à condition que le socle amont soit déjà clarifié :
+seeding explicite, accès normalisés, scénarios autonomes et dépendances
+périphériques correctement traitées. Sans cette base, l'environnement réaliste
+ne ferait qu'exposer plus vite les ambiguïtés existantes. Avec elle, il devient
+au contraire un levier puissant pour rapprocher la validation des conditions
+d'usage réelles sans s'enfermer dans une infrastructure permanente coûteuse.
 
 === Conditions de passage vers une automatisation crédible sur `develop`
 
+Le passage à une automatisation crédible après merge sur `develop` ne peut donc
+pas être pensé comme une simple étape de pipeline. Le dépôt formule clairement
+que cet objectif dépend d'abord de la stabilisation des suites et de leur
+capacité à s'exécuter au-delà des postes individuels. Cette condition est
+fondamentale. Une automatisation précoce d'un dispositif encore incertain ne
+fluidifie pas la livraison ; elle déplace l'incertitude dans la chaîne
+d'intégration et augmente le coût d'interprétation des échecs.
+
+Plusieurs préalables se dégagent. Les scénarios doivent être suffisamment
+autonomes pour être lancés sans orchestration implicite. Les comptes et rôles
+utilisés doivent être générés de façon déterministe. Les jeux de données doivent
+couvrir explicitement les états nécessaires aux parcours mission, aux suites
+hors mission et aux workflows Bubo. Enfin, les flux hybrides doivent avoir une
+frontière claire entre ce qui est préparé par seed et ce qui est volontairement
+stubé. Tant que ces points ne sont pas stabilisés, le signal d'une CI restera
+contestable.
+
+Il faut ajouter à cela une exigence de lisibilité opérationnelle. Pour qu'une
+automatisation soit utile, un échec doit renseigner rapidement sur sa cause
+probable : régression produit, dette de setup, dépendance externe, problème
+d'environnement ou contrat de données devenu obsolète. C'est ici que la
+réduction de la dette de feature, la suppression des scénarios dupliqués et
+l'abandon des doubles logins prennent tout leur sens. Une suite nettoyée n'est
+pas seulement plus élégante ; elle produit des diagnostics plus exploitables.
+Autrement dit, l'automatisation dépend de la qualité du corpus de tests autant
+que de l'infrastructure qui les exécute.
+
+La conséquence est claire : la mise en automatique sur `develop` représente le
+point d'aboutissement de ce premier levier, non son point de départ. Lorsqu'elle
+deviendra possible, elle réduira le besoin de vérifications manuelles après
+merge et renforcera la fluidité de la livraison. Mais la valeur de cette
+automatisation reposera entièrement sur la confiance acquise en amont dans la
+reproductibilité des validations.
+
 === Valeur attendue pour l'entreprise, limites actuelles et points encore ouverts
+
+L'intérêt de ce premier levier dépasse la technique de test au sens étroit. En
+fiabilisant les validations, l'entreprise peut espérer réduire les retests
+manuels, limiter les hésitations avant intégration et détecter plus tôt des
+régressions qui traversent plusieurs couches du système. Dans un environnement
+où le front public, Bubo, le backend distribué et les environnements éphémères
+participent à une même chaîne de valeur, cette amélioration a un effet direct
+sur le temps de coordination. Moins de doute sur le signal de test signifie
+aussi moins d'allers-retours pour comprendre si une anomalie provient du
+produit, du setup ou du support d'exécution.
+
+La portée intrapreneuriale du chantier apparaît ici nettement. Le seeding, les
+conventions de login, la clarification des rôles et la migration vers des jeux
+de données explicites constituent des standards réutilisables. Ils ne servent
+pas seulement à corriger un scénario particulier ; ils fabriquent un langage
+commun de validation entre plusieurs équipes et plusieurs domaines métier. Une
+initiative née d'un irritant local peut ainsi devenir un actif collectif, parce
+qu'elle réduit le coût de reproduction d'une bonne pratique.
+
+Il serait toutefois excessif de présenter la transformation comme achevée. Le
+dépôt montre au contraire que plusieurs tickets restent ouverts, que certaines
+features doivent encore être découpées ou nettoyées, et que l'articulation
+entre seeding et stubbing n'est pas entièrement stabilisée sur les flux les
+plus hybrides. De même, l'exécution sur Fabrica et l'automatisation sur
+`develop` sont visées explicitement, mais demeurent conditionnées par la
+résolution des fragilités de base. Cette prudence n'affaiblit pas le bilan ;
+elle le rend plus juste. La valeur déjà produite se situe dans la mise en place
+d'une trajectoire cohérente, fondée sur la reproductibilité, le réalisme
+d'exécution et la maîtrise du coût de validation.
+
+En définitive, fiabiliser les validations revient à fluidifier la livraison non
+pas parce que les équipes testeraient davantage, mais parce qu'elles testeraient
+mieux. La nuance est décisive. Dans un système riche en dépendances, la vitesse
+durable ne naît pas d'une compression artificielle des contrôles ; elle découle
+d'une meilleure qualité du signal produit par ces contrôles. C'est en cela que
+ce premier levier prépare le second : une prévention plus crédible réduit le
+bruit, et permet ensuite d'aborder les questions d'observabilité avec une base
+de confiance plus solide.
 
 == Second levier : renforcer la capacité de diagnostic sans surévaluer l'existant
 
