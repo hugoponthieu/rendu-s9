@@ -74,17 +74,17 @@ augmenter de façon disproportionnée le coût de sa vérification et de son
 diagnostic ? La question est structurante, car l'architecture observée montre
 que LeHibou ne repose ni sur une application monolithique simple à simuler, ni
 sur un environnement unique suffisant pour toutes les validations. Le backend
-orchestralise de nombreux services, les interfaces couvrent des publics et des
+orchestre de nombreux services, les interfaces couvrent des publics et des
 usages différents, et Fabrica cherche précisément à reconstruire des
 environnements éphémères complets avec des données proches de la production.
 Dans ce contexte, la fiabilité ne peut pas être obtenue par une simple
-addition d'outils ; elle  dépend de la qualité des articulations entre tests,
+addition d'outils ; elle dépend de la qualité des articulations entre tests,
 données, environnements et <<lexique-observabilite,observabilité>>.
 
 Du côté des tests end-to-end, plusieurs limites apparaissent. D'abord, certains
 scénarios restent sensibles à la machine d'exécution ou à l'état préalable des
-données. Ensuite, une partie des parcours  dépend encore de comptes statiques,
-de setups implicites ou de chaînages entre scénarios qui affaiblissent
+données. Ensuite, une partie des parcours dépend encore de comptes statiques,
+de préparations implicites ou de chaînages entre scénarios qui affaiblissent
 l'autonomie des suites. Enfin, la question des données ne se réduit pas à la
 création initiale d'entités. Elle implique aussi la disponibilité de jeux de
 données cohérents à travers plusieurs domaines métier, la capacité à nettoyer
@@ -126,10 +126,10 @@ chaîne de validation end-to-end afin d'identifier les causes concrètes
 d'instabilité, puis à construire un socle plus reproductible. Cette orientation
 se justifie par un principe simple : un dispositif de diagnostic, même utile,
 ne compense pas durablement une prévention insuffisante. Tant que les tests
-restent trop  dépendants d'états implicites ou de préconditions difficiles à
+restent trop dépendants d'états implicites ou de préconditions difficiles à
 reproduire, l'organisation continue de payer un coût élevé en vérifications
 manuelles, en retests et en hésitations au moment de livrer. Le travail sur le
-seeding, la normalisation des accès et l'autonomie des scénarios constitue donc
+seeding, la normalisation des accès et l'autonomie des scénarios constituent donc
 la première brique de la transformation.
 
 Ce premier temps n'est pas pensé comme une abstraction méthodologique, mais
@@ -159,7 +159,7 @@ Le fil directeur de l'ensemble peut ainsi se résumer en trois verbes :
 fiabiliser, observer, arbitrer. Fiabiliser, pour produire un signal de
 validation plus crédible avant livraison. Observer, pour rendre les incidents
 restants plus rapidement intelligibles. Arbitrer, enfin, parce que chaque
-amélioration doit être appréciée au regard de son coût de mise en oeuvre, de
+amélioration doit être appréciée au regard de son coût de mise en œuvre, de
 sa diffusion possible à l'échelle de l'entreprise et de son impact sur
 l'efficacité collective. Le rapport n'analyse donc pas un dispositif déjà
 entièrement industrialisé. Il étudie une trajectoire en cours, ses acquis, ses
@@ -208,7 +208,7 @@ profondeur fonctionnelle suggère une entreprise déjà engagée dans une
 industrialisation avancée de ses opérations. Elle permet de traiter des flux
 nombreux et hétérogènes, mais elle fait aussi apparaître une contrainte
 structurante : plus la valeur repose sur la coordination entre composants, plus
-la fiabilité des interfaces entre ces composants devient décisive.
+la fiabilité des interfaces entre ces composants devient importante.
 
 === Organisation de l'écosystème technique
 
@@ -242,7 +242,7 @@ complets et alimentés par des données proches du réel indique que les
 environnements génériques ne suffisent plus pour vérifier sérieusement les
 évolutions. Autrement dit, l'entreprise ne se contente plus d'un schéma où un
 développeur valide localement une fonctionnalité avant de la livrer. Elle doit
-pouvoir reconstituer, à coût maîtrise, des conditions d'exécution assez riches
+pouvoir reconstituer, à coût maîtrisé, des conditions d'exécution assez riches
 pour observer les interactions réelles entre interfaces, microservices,
 indexation, données restaurées et automatisations de déploiement. Cette
 capabilité est précieuse, mais elle rend également plus visible la complexité
@@ -287,7 +287,7 @@ attendre, investiguer ou reprendre.
 
 === Place de la fiabilité dans la création de valeur
 
-La création de valeur chez LeHibou  dépend fortement de la confiance qui peut
+La création de valeur chez LeHibou dépend fortement de la confiance qui peut
 être accordée aux flux numériques supportant l'intermédiation. La plateforme
 publique doit inspirer une impression de sérieux et de fluidité, mais cette
 impression n'a de substance que si les parcours clés fonctionnent de manière
@@ -313,7 +313,7 @@ de valeur interne.
 Il faut enfin souligner qu'une entreprise de cette nature tire une partie de sa
 crédibilité de sa capacité à absorber la complexité pour le compte de ses
 clients et de ses freelances. Or cette absorption ne peut pas reposer
-durablement sur l'effort héroïque des équipes. Elle exige des outils stables,
+durablement sur une mobilisation exceptionnelle des équipes. Elle exige des outils stables,
 des validations crédibles et des signaux d'incident suffisamment explicites
 pour permettre des réactions rapides. Lire la fiabilité comme levier de valeur
 revient donc à reconnaître qu'elle soutient simultanément la qualité perçue,
@@ -337,7 +337,7 @@ Cette logique correspond à une posture intrapreneuriale parce qu'elle cherche �
 transformer une douleur récurrente en capacité organisationnelle. Un test plus
 autonome, un environnement de validation plus réaliste ou un signal d'erreur
 mieux contextualisé profitent à plusieurs équipes à la fois. Ils réduisent la
- dépendance à des savoirs tacites, à des manipulations manuelles ou à des
+dépendance à des savoirs tacites, à des manipulations manuelles ou à des
 personnes capables, seules, de reconstruire le contexte d'un dysfonctionnement.
 Autrement dit, la valeur de la mission ne réside pas uniquement dans le fait de
 faire disparaître quelques échecs de pipeline. Elle réside dans l'augmentation
@@ -347,13 +347,13 @@ gouverné de manière artisanale.
 L'opportunité intrapreneuriale se situe également dans la façon d'articuler
 court terme et transformation plus durable. À court terme, les gains attendus
 portent sur la crédibilité des validations, la réduction des retests et une
-meilleure lisibilité des incidents. A plus long terme, le travail ouvre la
-possibilité d'une automatisation plus sûre sur `develop`, d'un usage plus
+meilleure lisibilité des incidents. À plus long terme, le travail ouvre la
+possibilité d'une automatisation plus fiable sur `develop`, d'un usage plus
 systématique des environnements éphémères et d'une diffusion de pratiques plus
 homogènes entre surfaces publiques, outils internes et services backend. Dans
 ce cadre, l'intrapreneuriat ne renvoie pas à la création d'un produit annexe,
 mais à la capacité de faire émerger, depuis un problème technique concret, un
-socle de fonctionnement plus scalable pour l'ensemble de l'entreprise.
+socle de fonctionnement plus facilement diffusable à l'échelle de l'entreprise.
 
 <<<
 
@@ -433,7 +433,7 @@ supporter une industrialisation sans générer davantage de bruit opérationnel.
 
 La dépendance aux données apparaît comme l'une des causes les plus structurantes
 des fragilités constatées. Plusieurs indices convergent sur un
-point : une part trop importante des suites repose encore sur des comptes
+point : une part importante des suites repose encore sur des comptes
 statiques, des fixtures difficiles à maintenir, des inscriptions effectuées
 uniquement pour préparer un scénario ou des états métier supposés déjà présents
 dans le système. Dans un environnement distribué, cette approche atteint vite
@@ -450,7 +450,7 @@ utilisateurs à la volée, mais de disposer d'une API capable de produire des
 local, les validations E2E et les environnements Fabrica. Les modules prévus
 pour les utilisateurs, les missions, les favoris, les alertes ou encore les
 données de référence traduisent une exigence de normalisation plus large :
-sortir d'une logique où les suites embarquent leur propre bricolage de setup et
+sortir d'une logique où les suites embarquent leurs propres mécanismes de setup et
 revenir à un contrat commun de préparation des données. Le fait que les tests
 aient jusqu'ici recopié des entités du backend dans leur propre code indique
 d'ailleurs que la séparation entre logique de test et logique de création des
@@ -464,7 +464,7 @@ qu'après seeding, les index ne sont pas nécessairement à jour et que
 la réindexation demeure, pour certains cas, une opération manuelle exécutée à
 l'intérieur du conteneur de recherche. Cette contrainte casse l'automatisation
 et explique pourquoi un scénario apparemment correct peut néanmoins échouer ou
-retourner des résultats incohérents. Ce point est décisif : dans un système où
+retourner des résultats incohérents. Ce point est important : dans un système où
 la recherche fait partie du comportement métier observable, la donnée seedée ne
 vaut réellement comme précondition que si son exposition via l'index est, elle
 aussi, intégrée au contrat d'exécution.
@@ -472,7 +472,7 @@ aussi, intégrée au contrat d'exécution.
 Enfin, la place de Fabrica confirme que la question des environnements ne peut
 pas être dissociée de celle des données. Les environnements temporaires,
 complets et alimentés par des données proches de la production offrent un cadre
-de validation plus crédible que des setups locaux simplifiés. Mais ils
+de validation plus crédible que des préparations locales simplifiées. Mais ils
 révèlent aussi plus tôt les dépendances réelles du système. Tant que le seeding
 reste partiel, que la réindexation n'est pas pilotable de façon programmée et
 que certaines suites conservent des préconditions implicites, l'environnement
@@ -592,7 +592,7 @@ terrain de test.
 Une telle reprise impose également une hiérarchisation. Les flux ciblés en
 premier ne sont pas choisis au hasard. Les scénarios mission simples servent à
 valider le contrat minimal du seeding, parce qu'ils permettent d'observer si
-une mission peut être rendue visible, modifiable, archivable ou searchable sans
+une mission peut être rendue visible, modifiable, archivable ou retrouvée via la recherche sans
 recourir à des manipulations UI parasites. Les scénarios multi-acteurs sont
 traités ensuite, car ils révèlent une difficulté d'un autre ordre : la
 nécessité de reproduire proprement des relations entre client, freelance,
@@ -605,8 +605,8 @@ sans que l'on sache s'il signale une régression, un problème de machine, un
 compte devenu invalide ou un état métier mal préparé, la chaîne de livraison
 reste suspendue à de multiples vérifications humaines. Reprendre l'existant
 revient donc à restaurer une propriété essentielle de la validation : sa
-capacité à être crue. C'est précisément cette crédibilité qui manque à un
-dispositif où les scénarios trop larges, dupliqués ou dépendants de setups
+capacité à inspirer confiance. C'est précisément cette crédibilité qui manque à un
+dispositif où les scénarios trop larges, dupliqués ou dépendants de préparations
 implicites entretiennent un doute structurel.
 
 === Construction d'un socle de test plus reproductible
@@ -626,7 +626,7 @@ autre scénario de la consulter ensuite, mais de disposer d'une mission déjà
 préparée dans l'état utile au test. Le gain attendu est double. D'une part, le
 scénario devient plus lisible : il exprime plus clairement ce qu'il contrôle.
 D'autre part, il devient rejouable sans dépendre d'une exécution précédente.
-Cette autonomie est décisive pour toute industrialisation ultérieure, car une
+Cette autonomie est importante pour toute industrialisation ultérieure, car une
 suite qui suppose un ordre fixe ou un état ambiant ne supporte ni l'exécution
 parallèle, ni la répétition, ni l'usage dans des environnements éphémères.
 
@@ -677,7 +677,7 @@ aussi l'accès au système. Le pattern combinant tâche de préparation et conne
 par API vise précisément à éviter que chaque feature réinvente ses propres
 étapes d'authentification. Une telle homogénéisation réduit l'exposition aux
 comptes partagés, mais elle a surtout un effet méthodologique : elle permet de
-faire du login un mécanisme d'entrée standardisé, au lieu d'un bricolage local
+faire du login un mécanisme d'entrée standardisé, au lieu d'un mécanisme local
 ajouté au scénario. Le résultat attendu n'est pas seulement une baisse de
 l'instabilité ; c'est aussi une meilleure diffusion des pratiques entre suites
 LeHibou et suites Bubo.
@@ -767,8 +767,8 @@ pas seulement plus élégante ; elle produit des diagnostics plus exploitables.
 Autrement dit, l'automatisation dépend de la qualité du corpus de tests autant
 que de l'infrastructure qui les exécute.
 
-La conséquence est claire : la mise en automatique sur `develop` représente le
-point d'aboutissement de ce premier levier, non son point de départ. Lorsqu'elle
+La conséquence est la suivante : la mise en automatique sur `develop` représente
+l'aboutissement de ce premier levier, non son point de départ. Lorsqu'elle
 deviendra possible, elle réduira le besoin de vérifications manuelles après
 merge et renforcera la fluidité de la livraison. Mais la valeur de cette
 automatisation reposera entièrement sur la confiance acquise en amont dans la
@@ -807,7 +807,7 @@ d'exécution et la maîtrise du coût de validation.
 
 En définitive, fiabiliser les validations revient à fluidifier la livraison non
 pas parce que les équipes testeraient davantage, mais parce qu'elles testeraient
-mieux. La nuance est décisive. Dans un système riche en dépendances, la vitesse
+mieux. La nuance est importante. Dans un système riche en dépendances, la vitesse
 durable ne naît pas d'une compression artificielle des contrôles ; elle découle
 d'une meilleure qualité du signal produit par ces contrôles. C'est en cela que
 ce premier levier prépare le second : une prévention plus crédible réduit le
@@ -831,10 +831,10 @@ requête HTTP, appel gRPC, message RabbitMQ ou événement WebSocket. Cette base
 n'est donc ni improvisée ni marginale ; elle témoigne d'une volonté réelle
 d'inscrire l'observabilité dans l'architecture courante.
 
-Pour autant, il serait trompeur d'en déduire que la capacité de diagnostic est
+Pour autant, il serait excessif d'en déduire que la capacité de diagnostic est
 déjà pleinement satisfaisante. Les besoins encore visibles autour de Sentry et de
 CloudWatch indiquent précisément l'inverse : l'outillage existe, mais son
-usage reste encore insuffisamment décisif pour identifier rapidement l'origine
+usage reste encore insuffisamment précis pour identifier rapidement l'origine
 d'un incident en production. Le besoin formulé n'est pas seulement de capter
 des erreurs, mais de pouvoir relier un signal à un service, à un endpoint, à
 un contexte d'exécution et, si possible, à un parcours métier intelligible.
@@ -915,7 +915,7 @@ de validation secondaire. Une meilleure lisibilité permet d'éviter des retests
 étendus ou des vérifications manuelles destinées surtout à compenser
 l'insuffisance du signal initial. Le second levier ne promet donc pas
 l'élimination des incidents ; il vise une baisse du coût unitaire de leur
-compréhension, ce qui constitue déjà un progrès stratégique dans un système
+compréhension, ce qui représente déjà un progrès notable dans un système
 distribué.
 
 === Limites, dépendances et mesures restant à mettre en oeuvre
@@ -933,7 +933,7 @@ mal hiérarchisées.
 
 La même prudence vaut pour Sentry. Le fait que le backend dispose déjà d'une
 bibliothèque commune, de tags de microservice et d'interceptors multi-protocoles
-constitue un socle sérieux, mais pas nécessairement un résultat final. Le
+constitue une base solide, mais pas nécessairement un résultat final. Le
 besoin explicite d'identifier plus sûrement le service ou l'endpoint
 responsable d'un bug montre qu'il existe encore un écart entre l'instrumentation
 présente et l'exploitabilité attendue. En outre, la qualité du diagnostic
@@ -992,7 +992,7 @@ autour d'un socle de seeding commun, de conventions de connexion plus nettes et
 de scénarios rendus autonomes répond précisément à cette difficulté. Il ne
 s'agit plus d'accumuler des parcours exhaustifs, mais de reconstruire des
 validations plus déterministes, mieux circonscrites et donc plus crédibles.
-Cette évolution est décisive, car elle transforme le test end-to-end en outil
+Cette évolution est importante, car elle transforme le test end-to-end en outil
 de décision plutôt qu'en source récurrente de doute.
 
 Le second apport réside dans le déplacement du regard porté sur le monitoring.
@@ -1024,7 +1024,7 @@ déjà de mécanismes transverses capables d'associer aux erreurs des informatio
 de contexte selon plusieurs protocoles, tandis que les applications clientes
 font remonter leurs propres événements. Cet existant fournit une base sérieuse
 pour mieux relier un incident à un microservice, à un endpoint ou à un parcours
-utilisateur. En ce sens, la mission montre que la difficulté n'est pas de
+utilisateur. En ce sens, le constat est moins celui d'un manque initial que de
 partir de zéro, mais de rendre plus cohérents les conventions, les métadonnées
 et la hiérarchie des signaux produits.
 
@@ -1061,7 +1061,7 @@ applicatives et logs d'exécution. Une telle généralisation demanderait de
 consolider des contrats communs et de mieux partager les conventions entre
 équipes.
 
-Au terme de cette analyse, la mission montre qu'une amélioration continue utile
+Au terme de cette analyse, il apparaît qu'une amélioration continue utile
 repose moins sur la multiplication des contrôles que sur une meilleure
 intelligibilité du système. Renforcer la fiabilité opérationnelle consiste
 alors à permettre des interventions plus rapides, des hypothèses mieux fondées
@@ -1104,7 +1104,7 @@ Dans le rapport, identifier rapidement l'endpoint concerné permet de localiser 
 
 [[lexique-fabrica]]
 Fabrica:: Nom de l'outillage interne servant à créer des environnements AWS temporaires, complets et proches du réel.
-Le projet est central dans le document car il permet d'exécuter des validations plus réalistes que de simples setups locaux.
+Le projet est central dans le document car il permet d'exécuter des validations plus réalistes que de simples préparations locales.
 
 [[lexique-fms]]
 FMS:: Abréviation de _Freelance Manager System_.
