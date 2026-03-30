@@ -1,4 +1,28 @@
 extends: default
 
+page:
+  margin: [18mm, 18mm, 20mm, 18mm]
+
+base:
+  font-color: #1f2933
+
+heading:
+  font-color: #102a43
+
+title-page:
+  background-image: image:images/cover.svg[fit=cover]
+  title:
+    top: 34%
+    font-size: 24
+    font-style: bold
+    line-height: 1.25
+    font-color: #102a43
+    align: center
+  authors:
+    margin-top: 10
+    font-size: 13
+    font-color: #486581
+    align: center
+
 image_caption_align: center
 image_caption_text_align: center

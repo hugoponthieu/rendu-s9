@@ -1,5 +1,5 @@
 = Faire de la fiabilité opérationnelle un levier intrapreneurial chez LeHibou : stabilisation des tests end-to-end, observabilité et maîtrise des coûts
-Author Name
+Hugo Ponthieu
 :doctype: article
 :toc:
 :toclevels: 2
